@@ -1,0 +1,55 @@
+# Java Gitignore
+
+# Compiled class files
+*.class
+
+# Log files
+*.log
+logs/
+
+# Package files
+*.jar
+*.war
+*.ear
+
+# Maven directories
+/target/
+/generated-sources/
+/generated-test-sources/
+
+# Gradle directories
+/.gradle/
+/build/
+
+# Eclipse files
+/.metadata/
+/.project
+/.classpath
+/.settings/
+/bin/
+
+# IntelliJ IDEA files
+*.iml
+*.ipr
+*.iws
+/.idea/
+/out/
+
+# NetBeans files
+/nbproject/private/
+/nbbuild/
+/dist/
+
+# VS Code files
+/.vscode/
+
+# Maven Wrapper files
+/mvnw
+/mvnw.cmd
+/.mvn/
+
+# OS-specific files
+.DS_Store
+
+# Others
+*.swp
