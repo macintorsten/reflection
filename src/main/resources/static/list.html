@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sample Manager - List</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .container { max-width: 1200px; }
+        .refresh-btn {
+            padding: 10px 20px;
+            font-size: 14px;
+            width: auto;
+        }
+        .sample-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+        .sample-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            word-wrap: break-word;
+        }
+        .sample-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        .sample-status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status-inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .empty-state a {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📋 All Samples</h1>
+        
+        <nav class="nav">
+            <a href="index.html">Create New</a>
+            <a href="list.html">View All</a>
+        </nav>
+
+        <div class="card">
+            <div class="header">
+                <h2>Sample Entries</h2>
+                <button class="refresh-btn" onclick="location.reload()">🔄 Refresh</button>
+            </div>
+            
+            <div id="loading" class="loading">Loading samples...</div>
+            
+            <div id="samplesContainer" class="samples-grid" hidden></div>
+            
+            <div id="emptyState" class="empty-state" hidden>
+                <h3>📦 No Samples Yet</h3>
+                <p>Get started by creating your first sample entry!</p>
+                <a href="index.html">Create Sample</a>
+            </div>
+
+            <div id="errorState" class="error-state" hidden>
+                <h3>❌ Error Loading Samples</h3>
+                <p id="errorMessage"></p>
+                <button class="refresh-btn" onclick="location.reload()">Try Again</button>
+            </div>
+        </div>
+    </div>
+
+    <template id="sampleTemplate">
+        <article class="sample-card">
+            <div class="sample-text" data-field="text"></div>
+            <div class="sample-number" data-field="number"></div>
+            <span class="sample-status" data-field="status"></span>
+        </article>
+    </template>
+
+    <script>
+        async function loadSamples() {
+            const loading = document.getElementById('loading');
+            const container = document.getElementById('samplesContainer');
+            const emptyState = document.getElementById('emptyState');
+            const errorState = document.getElementById('errorState');
+            const template = document.getElementById('sampleTemplate');
+
+            try {
+                const response = await fetch('/api/samples');
+                if (!response.ok) throw new Error('Failed to fetch samples');
+                
+                const samples = await response.json();
+                loading.hidden = true;
+                
+                if (samples.length === 0) {
+                    emptyState.hidden = false;
+                    return;
+                }
+
+                // Use DocumentFragment for better performance
+                const fragment = document.createDocumentFragment();
+                
+                samples.forEach(sample => {
+                    const card = template.content.cloneNode(true);
+                    const article = card.querySelector('article');
+                    
+                    // Fill in data
+                    card.querySelector('[data-field="text"]').textContent = sample.text;
+                    card.querySelector('[data-field="number"]').textContent = sample.number;
+                    
+                    const statusEl = card.querySelector('[data-field="status"]');
+                    statusEl.textContent = sample.status;
+                    statusEl.classList.add(`status-${sample.status}`);
+                    
+                    fragment.appendChild(card);
+                });
+                
+                container.appendChild(fragment);
+                container.hidden = false;
+                
+            } catch (error) {
+                loading.hidden = true;
+                errorState.hidden = false;
+                document.getElementById('errorMessage').textContent = error.message;
+            }
+        }
+
+        // Load samples when page loads
+        loadSamples();
+    </script>
+</body>
+</html>
