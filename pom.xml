@@ -66,6 +66,17 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <dependencyManagement>
+    <dependencies>
+      <!-- Security: Upgrade xmlunit-core to fix XXE vulnerability -->
+      <dependency>
+        <groupId>org.xmlunit</groupId>
+        <artifactId>xmlunit-core</artifactId>
+        <version>2.11.0</version>
+        <scope>test</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
   <build>
     <plugins>
       <plugin>
