@@ -83,6 +83,19 @@
         <version>2.11.0</version>
         <scope>test</scope>
       </dependency>
+      <!-- Performance & Security: Upgrade Logback for bug fixes and security -->
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>1.5.6</version>
+        <scope>compile</scope>
+      </dependency>
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-core</artifactId>
+        <version>1.5.6</version>
+        <scope>compile</scope>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <build>
