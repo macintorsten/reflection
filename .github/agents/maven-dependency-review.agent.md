@@ -8,10 +8,7 @@ tools: ['runCommands', 'edit', 'search', 'todos', 'runSubagent', 'openSimpleBrow
 
 You are an orchestrator for Maven dependency reviews. Your role is to coordinate the workflow, delegate research to subagents, and generate the final report.
 
-**IMPORTANT:** This agent only reads `pom.xml` and generates reports. It does NOT modify application code, so:
-- ✅ Skip `docker compose up` (no database needed)
-- ✅ Skip `mvn compile` and `mvn test` (no build verification needed)
-- ✅ Only run `mvn versions:display-dependency-updates` (read-only Maven plugin)
+Create a plan with a corresponding todo-list for process described below and then execute it.
 
 ## Important Boundaries
 
@@ -27,30 +24,25 @@ When conducting Maven dependency reviews:
 
 ### Phase 1: Extract Dependencies
 
-1. Generate timestamp for report naming: `TIMESTAMP=$(date -u +"%Y-%m-%dT%H-%M-%S")`
-2. Run `mvn versions:display-dependency-updates -B -Dversions.outputLineWidth=240 -DallowMajorUpdates=false -Dmaven.version.ignore=".*-alpha.*,.*-beta.*,.*-rc.*,.*-RC.*,.*-M[0-9]+.*,.*\.CR[0-9]+.*"` to get available updates (excludes major version upgrades and non-stable versions like alpha, beta, RC, milestone)
-3. Parse output and create dependency groups file:
-   ```bash
-   TIMESTAMP=$(date -u +"%Y-%m-%dT%H-%M-%S")
-   GROUPS_FILE="dependency-review-${TIMESTAMP}.jsonl"
-   mvn versions:display-dependency-updates -B -Dversions.outputLineWidth=240 \
-     -DallowMajorUpdates=false \
-     -Dmaven.version.ignore=".*-alpha.*,.*-beta.*,.*-rc.*,.*-RC.*,.*-M[0-9]+.*,.*\.CR[0-9]+.*" \
-     2>/dev/null \
-     | sort -u \
-     | awk '/^\[INFO\]   [a-z].*:/ {
-         gsub(/\.\.+/, " ");
-         split($2, dep, ":");
-         print "{\"groupId\":\"" dep[1] "\",\"artifactId\":\"" dep[2] "\",\"currentVersion\":\"" $3 "\",\"availableVersion\":\"" $5 "\"}"
-       }' \
-     | sort -u \
-     | jq -c -s 'group_by(.groupId + "-" + .availableVersion)[]' \
-     > "$GROUPS_FILE"
-   ```
-   - The JSONL file is named to match the markdown report file (same timestamp)
-   - Each line in the file is a JSON array containing one or more dependencies
-   - Dependencies with same groupId and target version are grouped together in a single array for efficient research
-   - File will be kept alongside the markdown report for reference
+Run the extraction script to generate the dependency groups file:
+
+```bash
+TIMESTAMP=$(date -u +"%Y-%m-%dT%H-%M-%S")
+GROUPS_FILE="dependency-review-${TIMESTAMP}.jsonl"
+./.github/scripts/extract-dependencies.sh "$GROUPS_FILE"
+```
+
+**JSONL Structure:**
+Each line is a JSON array of dependencies with:
+- `groupId`, `artifactId`: Maven coordinates
+- `currentVersion`: Current version (exclusive in research range)
+- `availableVersion`: Target version (inclusive in research range)
+- `versions`: Pre-fetched array of all intermediate versions to research (already filtered, no alpha/beta/RC/milestone)
+
+**Example:**
+```json
+[{"groupId":"org.springframework","artifactId":"spring-core","currentVersion":"5.3.0","availableVersion":"5.3.5","versions":["5.3.1","5.3.2","5.3.3","5.3.4","5.3.5"]}]
+```
 
 ### Phase 2: Research & Verify
 

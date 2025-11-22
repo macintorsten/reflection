@@ -29,45 +29,43 @@ Build tool versions managed by Spring Boot parent in `pom.xml`. Dev environment 
 
 ## Required Steps Before Code Changes
 
-### 1. Start Database
-
-**ALWAYS start PostgreSQL before builds/tests:** `docker compose up -d`
-
-PostgreSQL 15 on port 5432: db=mydb, user=postgres, pass=secret
-
-Stop: `docker compose down` | Reset: `docker compose down -v && docker compose up -d`
-
-### 2. Verify Build
+### 1. Verify Build
 
 ```bash
-mvn clean compile      # ~15-30s first run, ~5-10s cached
+mvn clean compile
 ```
 
-### 3. Verify Tests
+### 2. Verify Tests
 
 ```bash
-mvn test              # ~15-20s - 9 integration tests
+mvn test
 ```
 
-Tests use Testcontainers (separate from docker-compose). Database cleaned before each test (@BeforeEach).
+**Note:** Tests use Testcontainers and do NOT require `docker compose up`. Testcontainers manages its own PostgreSQL container. Database is cleaned before each test (@BeforeEach).
 
-**Common issues:** Docker not running | Port 5432 occupied | Testcontainers timeout
+**Common issues:** Docker not running | Testcontainers timeout
 
 ## Build Commands Reference
 
 ```bash
-mvn clean              # ~3s - removes /target/
-mvn compile            # ~15-30s first run, ~5-10s cached
-mvn package            # ~15-30s - runs tests, creates JAR
-mvn clean package      # ~20-40s - full clean build
+mvn clean
+mvn compile
+mvn package
+mvn clean package
 ```
 
 ## Running the Application
+
+**Only for running the application (not tests):**
 
 ```bash
 docker compose up -d    # Start database
 mvn spring-boot:run     # Start app on :8080
 ```
+
+PostgreSQL 15 on port 5432: db=mydb, user=postgres, pass=secret
+
+Stop: `docker compose down` | Reset: `docker compose down -v && docker compose up -d`
 
 **URLs:** `/api/samples` (API) | `/index.html` (create) | `/list.html` (view)
 
@@ -75,11 +73,11 @@ mvn spring-boot:run     # Start app on :8080
 
 ```bash
 mvn clean compile           # 1. Compile check
-docker compose up -d        # 2. Start DB
-mvn test                    # 3. Run tests
-mvn clean package           # 4. Full build
+mvn test                    # 2. Run tests (uses Testcontainers)
+mvn clean package           # 3. Full build
 
 # Manual API test (if needed):
+docker compose up -d        # Only needed for manual testing
 mvn spring-boot:run
 curl -X POST http://localhost:8080/api/samples -H "Content-Type: application/json" \
   -d '{"text":"Test","number":42,"status":"active"}'
@@ -88,10 +86,6 @@ curl http://localhost:8080/api/samples
 
 ## Critical Reminders
 
-⚠️ **Database Required:** Application and tests need PostgreSQL running
-
-🔧 **Three-Step Verification:** Start DB → Compile → Test
-
-📦 **Timing:** Maven 15-40s for builds | Tests 15-20s (Testcontainers startup included)
-
+⚠️ **Database for App Only:** `docker compose up` only needed for running the application, not for tests
+🔧 **Two-Step Verification:** Compile → Test (Testcontainers handles test database)
 🐳 **Use `docker compose` v2** NOT `docker-compose` v1

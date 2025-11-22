@@ -30,7 +30,7 @@ When creating dependency review reports:
 
 | Dependency | Current Version | Available Version | Summary |
 |------------|-----------------|-------------------|---------|
-| `groupId:artifactId` | X.Y.Z | A.B.C | **Release Notes:** [text](url) • [text](url)<br><br>**CVEs/Security:** {details or "None"}<br><br>**Breaking Changes:**<br>• Item 1<br>• Item 2<br><br>**Major Features:** (only if significant)<br>• Item 1<br><br>**Notes:** {migration warnings, stability, requirements} |
+| `groupId:artifactId` | X.Y.Z | A.B.C | **Release Notes:** [text](url) • [text](url)<br>**CVEs/Security:** {details or "None"}<br>**Breaking Changes:**<br>• Item 1<br>• Item 2<br>**Major Features:** (only if significant)<br>• Item 1<br>**Notes:** {migration warnings, stability, requirements} |
 
 ## Verification Status
 - Total dependencies: N
