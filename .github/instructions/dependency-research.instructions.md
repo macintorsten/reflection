@@ -12,7 +12,7 @@ Create a plan with a corresponding todo-list for the process described below and
 
 ## Core Requirements
 
-- **Scope:** Research versions in the `versions` array provided in the JSON
+- **Scope:** Use `.github/scripts/list-versions.sh` to determine versions to research
 - **Verification:** Validate all URLs with fetch_webpage before including
 - **Completeness:** Always include CVEs/Security and Breaking Changes sections (state "None" if empty)
 - **Relevance:** Include only significant changes (omit routine maintenance)
@@ -22,17 +22,21 @@ Create a plan with a corresponding todo-list for the process described below and
 
 ### Step 1: Determine Version Range
 
-Use the `versions` array from the provided JSON.
+**Get the list of versions to research:**
 
-**Example JSON:**
-```json
-{
-  "groupId": "org.springframework",
-  "artifactId": "spring-core",
-  "currentVersion": "5.3.0",
-  "availableVersion": "5.3.5",
-  "versions": ["5.3.1", "5.3.2", "5.3.3", "5.3.4", "5.3.5"]
-}
+```bash
+.github/scripts/list-versions.sh <groupId> <artifactId> <currentVersion> <availableVersion>
+```
+
+This script returns all stable intermediate versions from Maven Central, including the availableVersion.
+
+**Example:**
+```bash
+.github/scripts/list-versions.sh org.apache.commons commons-lang3 3.17.0 3.20.0
+# Output:
+# 3.18.0
+# 3.19.0
+# 3.20.0
 ```
 
 **Determine approach:**
@@ -72,7 +76,7 @@ curl -s "https://api.github.com/repos/{org}/{repo}/releases?per_page=100"
 **For aggregated changelogs:**
 1. Fetch the file
 2. Search for version markers
-3. Extract content for versions in the `versions` array
+3. Extract content for the versions you're researching
 
 **What to extract:**
 

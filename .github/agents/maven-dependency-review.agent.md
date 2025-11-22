@@ -33,30 +33,45 @@ GROUPS_FILE="dependency-review-${TIMESTAMP}.jsonl"
 ```
 
 **JSONL Structure:**
-Each line is a JSON array of dependencies with:
-- `groupId`, `artifactId`: Maven coordinates
-- `currentVersion`: Current version (exclusive in research range)
-- `availableVersion`: Target version (inclusive in research range)
-- `versions`: Pre-fetched array of all intermediate versions to research (already filtered, no alpha/beta/RC/milestone)
+Each line is a JSON array containing a group of related dependencies:
+- All dependencies in the array share the same `groupId` and `availableVersion`
+- Each dependency object contains:
+  - `groupId`: Maven group identifier
+  - `artifactId`: Maven artifact name
+  - `currentVersion`: Current version (exclusive in research range)
+  - `availableVersion`: Target version (inclusive in research range)
 
 **Example:**
 ```json
-[{"groupId":"org.springframework","artifactId":"spring-core","currentVersion":"5.3.0","availableVersion":"5.3.5","versions":["5.3.1","5.3.2","5.3.3","5.3.4","5.3.5"]}]
+[{"groupId":"org.springframework","artifactId":"spring-core","currentVersion":"5.3.0","availableVersion":"5.3.5"},{"groupId":"org.springframework","artifactId":"spring-context","currentVersion":"5.3.0","availableVersion":"5.3.5"}]
 ```
+
+**Getting Version List:**
+Researchers use `.github/scripts/list-versions.sh <groupId> <artifactId> <currentVersion> <availableVersion>` to get the list of versions to research.
 
 ### Phase 2: Research & Verify
 
 Process each dependency group using #tool:runSubagent, updating the report after each group is researched.
+
+**Reading the JSONL file:**
+```bash
+# Each line is a JSON array - process line by line
+while IFS= read -r group_json; do
+  # Parse the array and delegate to subagent
+  # group_json is already a JSON array of dependencies
+done < "$GROUPS_FILE"
+```
 
 **Subagent Instructions:**
 Each subagent must follow the [Dependency Research Instructions](../instructions/dependency-research.instructions.md).
 
 **Your prompt to each subagent:**
 ```
-Research Maven dependency updates for the following group (parse as JSON array):
+Research Maven dependency updates for the following group (JSON array of dependencies):
 {group_json}
 
-For each dependency in the group, research from currentVersion (exclusive) to availableVersion (inclusive).
+All dependencies in this array share the same groupId and are upgrading to the same availableVersion.
+For each dependency, research from currentVersion (exclusive) to availableVersion (inclusive).
 
 Follow the Dependency Research Instructions in ../instructions/dependency-research.instructions.md.
 
