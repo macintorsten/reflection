@@ -1,7 +1,10 @@
 ---
-name: Report Format Template
+name: Report-Format-Template
 description: Markdown table format for dependency review reports
 applyTo: ".github/agents/*dependency*.md"
+# Note: applyTo pattern matches same files as dependency-research.instructions.md by design.
+# This file guides orchestrators on output format, while dependency-research guides subagents on research methodology.
+# Both instructions apply to the maven-dependency-review.agent.md file simultaneously.
 ---
 
 # Dependency Review Report Format

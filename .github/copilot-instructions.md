@@ -6,51 +6,11 @@ Java Spring Boot REST API with PostgreSQL backend and HTML/CSS frontend. Manages
 
 **Stack:** Java (see `pom.xml`) | Maven (see `pom.xml`) | Spring Boot (see `pom.xml`) | PostgreSQL 15 | JPA/Hibernate | JUnit 5 + Testcontainers | Jackson JSON
 
-## Build and Test Instructions
+## Quick Reference
 
-### Prerequisites
-
-Java (see `pom.xml` `<source>` tag) | Maven | Docker with Compose v2 (`docker compose` NOT `docker-compose`)
-
-Build tool versions managed by Spring Boot parent in `pom.xml`. Dev environment config in `.devcontainer/devcontainer.json`.
-
-### Database Setup
-
-**ALWAYS start PostgreSQL before builds/tests:** `docker compose up -d`
-
-PostgreSQL 15 on port 5432: db=mydb, user=postgres, pass=secret
-
-Stop: `docker compose down` | Reset: `docker compose down -v && docker compose up -d`
-
-### Build Commands
-
-```bash
-mvn clean              # ~3s - removes /target/
-mvn compile            # ~15-30s first run, ~5-10s cached
-mvn package            # ~15-30s - runs tests, creates JAR
-mvn clean package      # ~20-40s - full clean build
-```
-
-### Running Tests
-
-**Start database first:** `docker compose up -d`
-
-```bash
-mvn test  # ~15-20s - 9 integration tests
-```
-
-Tests use Testcontainers (separate from docker-compose). Database cleaned before each test (@BeforeEach).
-
-**Common issues:** Docker not running | Port 5432 occupied | Testcontainers timeout
-
-### Running the Application
-
-```bash
-docker compose up -d    # Start database
-mvn spring-boot:run     # Start app on :8080
-```
-
-**URLs:** `/api/samples` (API) | `/index.html` (create) | `/list.html` (view)
+**Build & Test:** See [Build and Test Instructions](instructions/build-and-test.instructions.md) for detailed workflow  
+**Database:** PostgreSQL 15 at `localhost:5432/mydb` (user: postgres, pass: secret)  
+**Start App:** `docker compose up -d && mvn spring-boot:run` → http://localhost:8080
 
 ## Project Layout and Architecture
 
@@ -91,21 +51,6 @@ Config files in root:
 - API: POST/GET `/api/samples` | Validation via `@Valid` | Public fields (no getters/setters)
 - DB: PostgreSQL 15 at `localhost:5432/mydb` | Tests use Testcontainers
 
-## Validation Steps
-
-```bash
-mvn clean compile           # 1. Compile check
-docker compose up -d        # 2. Start DB
-mvn test                    # 3. Run tests
-mvn clean package           # 4. Full build
-
-# Manual API test (if needed):
-mvn spring-boot:run
-curl -X POST http://localhost:8080/api/samples -H "Content-Type: application/json" \
-  -d '{"text":"Test","number":42,"status":"active"}'
-curl http://localhost:8080/api/samples
-```
-
 ## Dependencies
 
 See `pom.xml` for current versions. Key dependencies:
@@ -123,8 +68,6 @@ Excludes: `/target/`, `*.class`, `*.jar`, IDE files (`.idea/`, `.vscode/`, etc.)
 
 ⚠️ **Trust these instructions first** - only search if instructions are incomplete/incorrect
 
-🔧 **Before ANY code changes:** Start DB (`docker compose up -d`) → verify `mvn clean compile` → verify `mvn test`
-
-📦 **Timing:** Maven 15-40s for builds | Tests 15-20s (Testcontainers startup included)
+🔧 **Before code/config changes:** See [Build and Test Instructions](instructions/build-and-test.instructions.md) for verification steps
 
 🐳 **Use `docker compose` v2** NOT `docker-compose` v1
