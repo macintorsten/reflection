@@ -27,9 +27,12 @@ When conducting Maven dependency reviews:
 
 ### Phase 1: Extract Dependencies
 
-1. Run `mvn versions:display-dependency-updates -B -Dversions.outputLineWidth=240 -DallowMajorUpdates=false -Dmaven.version.ignore=".*-alpha.*,.*-beta.*,.*-rc.*,.*-RC.*,.*-M[0-9]+.*,.*\.CR[0-9]+.*"` to get available updates (excludes major version upgrades and non-stable versions like alpha, beta, RC, milestone)
-2. Parse output and create dependency groups in one command:
+1. Generate timestamp for report naming: `TIMESTAMP=$(date -u +"%Y-%m-%dT%H-%M-%S")`
+2. Run `mvn versions:display-dependency-updates -B -Dversions.outputLineWidth=240 -DallowMajorUpdates=false -Dmaven.version.ignore=".*-alpha.*,.*-beta.*,.*-rc.*,.*-RC.*,.*-M[0-9]+.*,.*\.CR[0-9]+.*"` to get available updates (excludes major version upgrades and non-stable versions like alpha, beta, RC, milestone)
+3. Parse output and create dependency groups file:
    ```bash
+   TIMESTAMP=$(date -u +"%Y-%m-%dT%H-%M-%S")
+   GROUPS_FILE="dependency-review-${TIMESTAMP}.jsonl"
    mvn versions:display-dependency-updates -B -Dversions.outputLineWidth=240 \
      -DallowMajorUpdates=false \
      -Dmaven.version.ignore=".*-alpha.*,.*-beta.*,.*-rc.*,.*-RC.*,.*-M[0-9]+.*,.*\.CR[0-9]+.*" \
@@ -42,10 +45,12 @@ When conducting Maven dependency reviews:
        }' \
      | sort -u \
      | jq -c -s 'group_by(.groupId + "-" + .availableVersion)[]' \
-     > dependency_groups.jsonl
+     > "$GROUPS_FILE"
    ```
-   - Each line in the output file is a JSON array containing one or more dependencies
+   - The JSONL file is named to match the markdown report file (same timestamp)
+   - Each line in the file is a JSON array containing one or more dependencies
    - Dependencies with same groupId and target version are grouped together in a single array for efficient research
+   - File will be kept alongside the markdown report for reference
 
 ### Phase 2: Research & Verify
 
@@ -76,7 +81,7 @@ Work autonomously. Return structured data when complete.
 **Note:** Dependencies grouped together share the same groupId and target version, so they can often be researched from the same release notes source.
 
 **Workflow:**
-1. For each dependency group (line in dependency_groups.jsonl):
+1. For each dependency group (line in `$GROUPS_FILE`):
    - Launch #tool:runSubagent with the prompt above
    - Wait for subagent to complete research
    - Immediately append results to the report file (see Phase 3)
@@ -88,16 +93,12 @@ Work autonomously. Return structured data when complete.
 Create timestamped markdown file in **root directory** at the START of Phase 2, using the format defined in [Report Format Template](../instructions/report-format.instructions.md).
 
 **Report Location:** `/workspace/dependency-review-YYYY-MM-DDTHH-MM-SS.md` (root directory)
-
-**Why root directory:**
-- Maximum visibility for ad-hoc reviews
-- Easy to find and open
-- Consistent with existing practice
-- User manages retention/cleanup of old reports
+**JSONL Location:** `/workspace/dependency-review-YYYY-MM-DDTHH-MM-SS.jsonl` (same timestamp, root directory)
 
 **Initial Report Structure:**
-1. Generate timestamp: `date -u +"%Y-%m-%dT%H-%M-%S"`
-2. Create file with header and empty table:
+1. Use the same `$TIMESTAMP` from Phase 1
+2. Create markdown file: `dependency-review-${TIMESTAMP}.md`
+3. Initialize with header and empty table:
    ```markdown
    # Maven Dependency Review - {timestamp}
    
@@ -107,7 +108,7 @@ Create timestamped markdown file in **root directory** at the START of Phase 2, 
    |------------|-----------------|-------------------|---------|
    
    ## Verification Status
-   - Total dependencies: {count from dependency_groups.jsonl}
+   - Total dependencies: {count from $GROUPS_FILE}
    - Research in progress...
    ```
 
@@ -122,7 +123,7 @@ After each subagent completes in Phase 2:
 At end of Phase 2, the report will be complete with all dependency rows populated.
 
 **Critical Rules:**
-- ONE table row per dependency group (same as lines in dependency_groups.jsonl)
+- ONE table row per dependency group (same as lines in `$GROUPS_FILE`)
 - If group has multiple dependencies (e.g., spring-beans, spring-context, spring-core), create ONE row listing all artifacts
 - Table has 4 columns: Dependency | Current Version | Available Version | Summary
 - For grouped dependencies, list all artifacts in Dependency column separated by `<br>`
@@ -137,7 +138,7 @@ At end of Phase 2, the report will be complete with all dependency rows populate
 Launch verification #tool:runSubagent to:
 
 1. Read generated markdown report file
-2. Count groups: `wc -l < dependency_groups.jsonl`
+2. Count groups: `wc -l < "$GROUPS_FILE"`
 3. Count table rows: `grep -c '^\|' {report-file} - 2` (subtract 2 for header/separator)
 4. Verify counts match (critical: must be equal)
 5. Run `lychee --format json {report-file}` to check URLs (fallback to curl/wget on Linux, Invoke-WebRequest on Windows if lychee unavailable)
@@ -152,23 +153,14 @@ Launch verification #tool:runSubagent to:
 
 **Important: Verification uses info already in report - no re-downloading release notes unless fixing broken links.**
 
-### Phase 5: Present Results
-
-After verification:
-
-1. Open preview: `#tool:openSimpleBrowser` with report path
-2. Summarize:
-   - Total groups reviewed
-   - Security issues count
-   - Breaking changes count
-   - Report file path
+**Note:** The JSONL file (`dependency-review-${TIMESTAMP}.jsonl`) is kept alongside the markdown report for reference and potential re-processing.
 
 ## Key Principles for Orchestration
 
 - **Delegate research:** Use #tool:runSubagent for all dependency research
 - **Incremental updates:** Update report immediately after each group is researched
 - **Follow templates:** Use referenced instruction files for structure
-- **One row per group:** Table rows must match dependency_groups.jsonl line count
+- **One row per group:** Table rows must match JSONL file line count
 - **Check thoroughly:** Run lychee on final report, verify counts match
 - **Security first:** Every row needs CVEs/Security section
 - **Show results:** Open preview and summarize

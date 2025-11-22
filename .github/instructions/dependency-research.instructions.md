@@ -2,136 +2,161 @@
 name: Dependency-Research-Instructions
 description: Instructions for subagents researching Maven dependency updates
 applyTo: "dependency-review*.md"
-# Note: applyTo pattern matches same files as report-format.instructions.md by design.
-# This file guides subagents on research methodology, while report-format guides orchestrators on output format.
-# Both instructions apply to the maven-dependency-review.agent.md file simultaneously.
 ---
 
 # Dependency Research Instructions
 
-You are a research subagent focused on analyzing Maven dependency updates. Your task is to research a specific dependency version range and return verified information.
+You are a research subagent analyzing Maven dependency updates. Research the version range and return verified findings.
 
-## Important Boundaries
+## Core Requirements
 
-- Research only from currentVersion (exclusive) to availableVersion (inclusive)
-- Verify all URLs with #tool:fetch before including
-- Exclude alpha, beta, RC, and milestone versions
-- State "None" explicitly for CVEs/Security and Breaking Changes (never omit)
-- Include only significant changes (omit minor enhancements)
-- Work autonomously
+- **Scope:** Research from currentVersion (exclusive) to availableVersion (inclusive)
+- **Verification:** Validate all URLs with fetch_webpage before including
+- **Exclusions:** Skip alpha, beta, RC, and milestone versions
+- **Completeness:** Always include CVEs/Security and Breaking Changes sections (state "None" if empty)
+- **Relevance:** Include only significant changes (omit routine maintenance)
+- **Autonomy:** Work independently without asking for clarification
 
 ## Research Workflow
 
-### Step 1: Find Release Notes URLs
+### Step 1: Determine Version Range
 
-**Check Previous Reports First:**
+First, identify all versions between current and available.
+
+**List versions from Maven Central:**
+```bash
+curl -s "https://search.maven.org/solrsearch/select?q=g:{groupId}+AND+a:{artifactId}&core=gav&rows=100&wt=json" \
+  | jq -r '.response.docs[].v' \
+  | sort -V
+```
+
+**Filter to your range:**
+- Exclude versions ≤ currentVersion
+- Include versions ≤ availableVersion
+- Skip unstable versions (alpha, beta, RC, M1, etc.)
+
+**Determine approach:**
+- ≤5 versions: Research each version individually
+- \>5 versions: Aggregate findings, note "N versions behind - comprehensive review recommended"
+
+### Step 2: Find Release Notes URLs
+
+**Check previous reports first (fastest):**
 ```bash
 grep "{groupId}" dependency-review-*.md | grep -o 'https://[^)]*'
 ```
-Gives exact URLs, tag formats, and repository locations from past reviews.
+Provides exact URL patterns and repository locations from past reviews.
 
-**Get Project URL from Maven Central:**
-```bash
-curl -s "https://repo1.maven.org/maven2/{groupId-as-path}/{artifactId}/{version}/{artifactId}-{version}.pom" | grep -A1 '<url>'
+**Discover primary release notes source:**
+
+Try these in order until successful:
+
+1. **Maven Central POM (authoritative):**
+   ```bash
+   curl -s "https://repo1.maven.org/maven2/{groupId-as-path}/{artifactId}/{version}/{artifactId}-{version}.pom" \
+     | grep -A1 '<url>'
+   ```
+
+2. **GitHub releases (most common):**
+   - General page: `https://github.com/{org}/{repo}/releases`
+   - Verify with fetch_webpage, scan for version-specific entries
+
+3. **Apache projects:**
+   - `https://github.com/apache/{project}/blob/master/RELEASE-NOTES.txt`
+   - `https://downloads.apache.org/{project}/RELEASE-NOTES.txt`
+
+4. **Spring projects:**
+   - `https://github.com/spring-projects/{repo}/releases`
+
+**Generate version-specific URLs:**
+
+Once you find the first working URL, infer the pattern and generate URLs for all versions:
+
+**GitHub patterns:**
+- `https://github.com/{org}/{repo}/releases/tag/v{version}` (most common)
+- `https://github.com/{org}/{repo}/releases/tag/{version}` (no prefix)
+- `https://github.com/{org}/{repo}/releases/tag/r{version}` (JUnit-style)
+- `https://github.com/{org}/{repo}/releases/tag/{artifactId}-{version}` (multi-module)
+
+**Example inference:**
+```
+Found: https://github.com/FasterXML/jackson/wiki/Jackson-Release-2.17
+Infer: https://github.com/FasterXML/jackson/wiki/Jackson-Release-2.18
+       https://github.com/FasterXML/jackson/wiki/Jackson-Release-2.19
 ```
 
-**List All Versions:**
-```bash
-curl -s "https://search.maven.org/solrsearch/select?q=g:{groupId}+AND+a:{artifactId}&core=gav&rows=100&wt=json" | jq -r '.response.docs[].v'
-```
-Identifies intermediate versions between current and available.
-
-**Common Patterns to Try:**
-
-GitHub releases (verify with #tool:fetch):
-1. `https://github.com/{org}/{repo}/releases` (general page - most reliable)
-2. `https://github.com/{org}/{repo}/releases/tag/v{version}` (specific tag with v prefix)
-3. `https://github.com/{org}/{repo}/releases/tag/{version}` (no prefix)
-4. `https://github.com/{org}/{repo}/releases/tag/r{version}` (JUnit style)
-
-**Important:** If individual tag URLs return 404, use the general releases page and search within the fetched content for version-specific changelogs.
-
-Project-specific sources:
-- Maven Central: `https://search.maven.org/artifact/{groupId}/{artifactId}`
-- Apache projects: `https://github.com/apache/{project}/blob/master/RELEASE-NOTES.txt` or `https://downloads.apache.org/{project}/RELEASE-NOTES.txt`
-- Spring projects: `https://github.com/spring-projects/{repo}/releases`
-- Project homepage or README for release notes links
-
-### Step 2: Determine Version Range
-
-**For small gaps (≤5 versions):**
-- Research each intermediate version
-- Provide specific release notes URLs for each
-
-**For large gaps (>5 versions):**
-- Aggregate findings (cumulative CVEs, combined breaking changes)
-- Provide link to overall releases page
-- Add note: "Dependency is N versions behind (X.Y.Z → A.B.C) - comprehensive manual review recommended"
+**Validation:**
+- Verify at least one URL per version (or general page) with fetch_webpage
+- If specific version URLs fail, use general releases page
+- Mark general pages clearly: "See releases page for version X.Y.Z"
 
 ### Step 3: Analyze Changes
 
-**Handling large changelog files:**
-- When fetching a changelog that contains multiple versions (e.g., RELEASE-NOTES.txt), search within the content for section headers matching your version range
-- Look for patterns like "Apache Commons Lang 3.17.0", "Version 3.16.0", "## 3.15.0", etc.
-- Extract only the relevant sections between currentVersion (exclusive) and availableVersion (inclusive)
-- If content is truncated, make note but work with available information
+**For aggregated changelogs (RELEASE-NOTES.txt, CHANGELOG.md):**
+1. Fetch the complete file
+2. Search for version markers: "Version X.Y.Z", "## X.Y.Z", "{artifactId} X.Y.Z"
+3. Extract content between currentVersion and availableVersion
+4. If truncated, note limitation and work with available content
 
-**Priority order:**
+**What to extract (priority order):**
 
-**ALWAYS include:**
-- **CVEs/Security:** List all CVE-YYYY-NNNNN IDs with brief impact, or state "None"
-- **Breaking Changes:** All API breaks, behavior changes, requirement changes (Java version, etc.)
-  - Include: Module system changes, annotation migrations, API signature changes
-  - Include: Behavior changes in existing methods, removed/deprecated features
-  - Include: Dependency requirement changes (Java version, library versions)
+**Required (always include):**
+- **CVEs/Security:** All CVE-YYYY-NNNNN with brief impact description, or "None"
+- **Breaking Changes:**
+  - API removals, signature changes, behavior modifications
+  - Module system changes (JPMS, packages)
+  - Dependency requirement changes (Java version, library upgrades)
+  - Configuration format changes
+  - Deprecated features removal
 
-**Include only if significant:**
-- **Major Features:** Only transformative capabilities (skip minor additions)
-- **Critical Fixes:** Only data corruption/loss, crashes, hangs, severe performance issues
+**Include if significant:**
+- **Major Features:** Transformative capabilities only (new APIs, major refactors, performance overhauls)
+- **Critical Fixes:** Data corruption, security hardening, crash/hang fixes
 
-**Omit entirely:**
-- Minor enhancements, refactorings, deprecations (unless they affect usage)
-- Regular bug fixes, performance tweaks, documentation updates
+**Omit:**
+- Routine bug fixes and minor enhancements
+- Performance tweaks (unless dramatic)
+- Documentation and build system updates
+- Deprecation warnings (unless removal is imminent)
 
-### Step 4: Return Data Structure
+### Step 4: Return Structured Data
 
-Return your findings in this format:
-
-```
+**Format:**
+```markdown
 ## Dependency: {groupId}:{artifactId}
-- **Current Version:** {version}
-- **Available Version:** {version}
+- **Current Version:** {currentVersion}
+- **Available Version:** {availableVersion}
 - **Release Notes URLs:** 
   - {verified-url-1}
   - {verified-url-2}
-  
-**CVEs/Security:** {list or "None"}
+  - {verified-url-n}
+
+**CVEs/Security:** {CVE list with impact OR "None"}
 
 **Breaking Changes:**
-- {item}
-- {item}
+- {change with version number}
+- {change with version number}
 
-**Major Features:** (if significant)
-- {item}
+**Major Features:**
+- {feature with version number}
 
-**Notes:** {migration warnings, stability concerns, Java version requirements}
+**Notes:** {migration warnings, stability notes, Java requirements, version gap warnings}
 ```
 
-## Summary Guidelines
+**Best practices:**
+- List URLs in version order (oldest to newest)
+- Prefix changes with version number when gap >2 versions
+- Keep descriptions concise (one line per item)
+- Note version gaps: "N versions behind (X → Y) - comprehensive review recommended"
 
-- 150-250 words maximum
-- Include only verified, accessible information
-- Prioritize security (CVEs with details)
-- State "None" explicitly (never omit sections)
-- Summarize minor changes: "Various bug fixes and enhancements"
+## Quality Checklist
 
-## Verification Checklist
-
-When reviewing your research output, verify:
-1. ✅ All URLs have been verified with #tool:fetch
-2. ✅ CVEs/Security section is present (even if "None")
-3. ✅ Breaking Changes section is present
-4. ✅ Version range is correctly stated (currentVersion to availableVersion)
-5. ✅ Summary is concise (150-250 words maximum)
-6. ✅ Only significant changes are included (no minor enhancements)
-7. ✅ Data structure matches the required format exactly
+Before returning, verify:
+1. ✅ Version range is correct (currentVersion exclusive, availableVersion inclusive)
+2. ✅ All URLs validated
+3. ✅ CVEs/Security section present (even if "None")
+4. ✅ Breaking Changes section present (even if empty)
+5. ✅ Changes include version numbers (when gap >2)
+6. ✅ Data structure matches template exactly
+7. ✅ Only significant items included (no routine maintenance)
+8. ✅ Notes mention any critical migration concerns
