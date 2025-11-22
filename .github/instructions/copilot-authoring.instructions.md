@@ -1,5 +1,5 @@
 ---
-applyTo: ".github/**/*.{md,agent.md,instructions.md,prompt.md}"
+applyTo: ".github/**/*.md"
 ---
 
 # GitHub Copilot Authoring Best Practices
@@ -144,7 +144,8 @@ Follow the [Dependency Research Instructions](../instructions/dependency-researc
 
 ### Restrict Tools by Need
 ```yaml
-# Too permissive - agent can do anything
+# Allow all tools - agent can use any available tool
+# (omit tools field or use tools: ['*'])
 tools: ['*']
 
 # Better - agent can only read and search
@@ -168,11 +169,14 @@ tools: ['runCommands', 'edit', 'search', 'openSimpleBrowser', 'fetch']
 - Want to maintain separation of concerns
 
 ### How to Delegate
+Provide a detailed prompt to the subagent:
 ```markdown
 Launch #tool:runSubagent with this prompt:
-```
-[Detailed prompt for subagent]
-```
+
+Research Maven dependency updates for the following group:
+{group_json}
+
+Return findings with verified release notes and security information.
 ```
 
 ### Best Practices
