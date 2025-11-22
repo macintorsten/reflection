@@ -4,15 +4,15 @@
 
 Java Spring Boot REST API with PostgreSQL backend and HTML/CSS frontend. Manages "Sample" entities with CRUD operations.
 
-**Stack:** Java 17 | Maven 3.9.11 | Spring Boot 3.2.1 | PostgreSQL 15 | JPA/Hibernate | JUnit 5 + Testcontainers | Jackson JSON
-
-**Size:** ~10 Java files, ~2,700 lines total
+**Stack:** Java (see `pom.xml`) | Maven (see `pom.xml`) | Spring Boot (see `pom.xml`) | PostgreSQL 15 | JPA/Hibernate | JUnit 5 + Testcontainers | Jackson JSON
 
 ## Build and Test Instructions
 
 ### Prerequisites
 
-Java 17 | Maven 3.9.11+ | Docker with Compose v2 (`docker compose` NOT `docker-compose`)
+Java (see `pom.xml` `<source>` tag) | Maven | Docker with Compose v2 (`docker compose` NOT `docker-compose`)
+
+Build tool versions managed by Spring Boot parent in `pom.xml`. Dev environment config in `.devcontainer/devcontainer.json`.
 
 ### Database Setup
 
@@ -56,42 +56,32 @@ mvn spring-boot:run     # Start app on :8080
 
 ### Directory Structure
 
-```
-/home/runner/work/reflection/reflection/
-├── .devcontainer/
-│   └── devcontainer.json          # VS Code dev container config (Java 21, Maven)
-├── .github/
-│   ├── agents/                     # Custom agent definitions
-│   └── instructions/               # Agent instruction templates
-├── src/
-│   ├── main/
-│   │   ├── java/com/example/reflection/
-│   │   │   ├── ReflectionApplication.java    # Spring Boot main class (@SpringBootApplication)
-│   │   │   ├── Sample.java                   # JPA Entity with Jackson annotations
-│   │   │   ├── SampleDTO.java                # Data Transfer Object with validation
-│   │   │   ├── SampleController.java         # REST Controller (@RestController)
-│   │   │   └── SampleRepository.java         # Spring Data JPA Repository
-│   │   └── resources/
-│   │       ├── application.properties        # Database config (PostgreSQL connection)
-│   │       └── static/                       # Static web resources
-│   │           ├── index.html                # Create sample form
-│   │           ├── list.html                 # List samples page
-│   │           └── styles.css                # Shared CSS styles
-│   └── test/
-│       └── java/com/example/reflection/
-│           └── SampleControllerIntegrationTest.java  # Integration tests (10 tests)
-├── .gitignore                      # Java/Maven/IDE ignores
-├── docker-compose.yml              # PostgreSQL 15 database service
-└── pom.xml                         # Maven configuration (Spring Boot 3.2.1)
-```
+Main source code in `src/main/java/com/example/reflection/`:
+- `ReflectionApplication.java` - Spring Boot main class
+- `Sample.java` - JPA Entity with Jackson annotations
+- `SampleDTO.java` - Data Transfer Object with validation
+- `SampleController.java` - REST Controller
+- `SampleRepository.java` - Spring Data JPA Repository
+
+Resources in `src/main/resources/`:
+- `application.properties` - Database config
+- `static/` - HTML/CSS frontend (index.html, list.html, styles.css)
+
+Tests in `src/test/java/com/example/reflection/`:
+- `SampleControllerIntegrationTest.java` - Integration tests (Testcontainers)
+
+Config files in root:
+- `pom.xml` - Maven/Spring Boot config
+- `docker-compose.yml` - PostgreSQL service
+- `.devcontainer/devcontainer.json` - Dev environment
 
 ### Key Files
 
-**Config:** `pom.xml` (Spring Boot 3.2.1) | `application.properties` (DB config) | `docker-compose.yml` (PostgreSQL)
+**Config:** `pom.xml` (Maven/Spring Boot) | `application.properties` (DB config) | `docker-compose.yml` (PostgreSQL)
 
 **Core:** `ReflectionApplication.java` (main) | `Sample.java` (JPA entity) | `SampleDTO.java` (validation) | `SampleController.java` (REST) | `SampleRepository.java` (JPA repo)
 
-**Test:** `SampleControllerIntegrationTest.java` (9 tests, Testcontainers)
+**Test:** `SampleControllerIntegrationTest.java` (integration tests with Testcontainers)
 
 ### Architecture
 
@@ -118,7 +108,12 @@ curl http://localhost:8080/api/samples
 
 ## Dependencies
 
-Java 17 | Maven 3.9.11 | Spring Boot 3.2.1 | Spring 6.2.1 | JUnit 5.10.1 | Jackson 2.15.3 | PostgreSQL 42.7.1 | Testcontainers 1.19.3 | Guava 33.0.0 | Commons Lang3 3.14.0
+See `pom.xml` for current versions. Key dependencies:
+- Spring Boot parent (manages most dependency versions)
+- Spring Boot starters: web, data-jpa, validation, test
+- PostgreSQL driver
+- Testcontainers (core, postgresql, junit-jupiter)
+- Guava, Commons Lang3, HttpClient5
 
 ## Git Ignore
 
