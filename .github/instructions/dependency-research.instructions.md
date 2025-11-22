@@ -12,9 +12,9 @@ Create a plan with a corresponding todo-list for the process described below and
 
 ## Core Requirements
 
-- **Scope:** Use `.github/scripts/list-versions.sh` to determine versions to research
+- **Scope:** Use `curl -s https://repo1.maven.org/maven2/{group-as-path}/{artifactId-as-path}/maven-metadata.xml` to identify available versions
 - **Verification:** Validate all URLs with fetch_webpage before including
-- **Completeness:** Always include CVEs/Security and Breaking Changes sections (state "None" if empty)
+- **Completeness:** Always include CVEs/GHSA/Security and Breaking Changes sections (state "None" if empty)
 - **Relevance:** Include only significant changes (omit routine maintenance)
 - **Autonomy:** Work independently without asking for clarification
 
@@ -24,20 +24,7 @@ Create a plan with a corresponding todo-list for the process described below and
 
 **Get the list of versions to research:**
 
-```bash
-.github/scripts/list-versions.sh <groupId> <artifactId> <currentVersion> <availableVersion>
-```
-
-This script returns all stable intermediate versions from Maven Central, including the availableVersion.
-
-**Example:**
-```bash
-.github/scripts/list-versions.sh org.apache.commons commons-lang3 3.17.0 3.20.0
-# Output:
-# 3.18.0
-# 3.19.0
-# 3.20.0
-```
+Use `curl -s https://repo1.maven.org/maven2/{group-as-path}/{artifactId-as-path}/maven-metadata.xml` to identify available versions. Extract versions newer than the current version up to and including the latest available version. Do not consider pre-release versions (alpha, beta, RC).
 
 **Determine approach:**
 - ≤5 versions: Research each version individually
@@ -81,7 +68,7 @@ curl -s "https://api.github.com/repos/{org}/{repo}/releases?per_page=100"
 **What to extract:**
 
 **Required:**
-- **CVEs/Security:** All CVE-YYYY-NNNNN with brief impact, or "None"
+- **Security:** All CVE-YYYY-NNNNN or GHSA-XXXX-XXXX with brief impact, or "None"
 - **Breaking Changes:**
   - API removals, signature changes, behavior modifications
   - Module system changes (JPMS, packages)

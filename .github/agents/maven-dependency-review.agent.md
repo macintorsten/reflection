@@ -46,9 +46,6 @@ Each line is a JSON array containing a group of related dependencies:
 [{"groupId":"org.springframework","artifactId":"spring-core","currentVersion":"5.3.0","availableVersion":"5.3.5"},{"groupId":"org.springframework","artifactId":"spring-context","currentVersion":"5.3.0","availableVersion":"5.3.5"}]
 ```
 
-**Getting Version List:**
-Researchers use `.github/scripts/list-versions.sh <groupId> <artifactId> <currentVersion> <availableVersion>` to get the list of versions to research.
-
 ### Phase 2: Research & Verify
 
 Process each dependency group using #tool:runSubagent, updating the report after each group is researched.
