@@ -1,11 +1,22 @@
 ---
 name: Report Format Template
 description: Markdown table format for dependency review reports
+applyTo: ".github/agents/*dependency*.md"
 ---
 
 # Dependency Review Report Format
 
 When generating the final dependency review report, use this exact table structure:
+
+## Important Boundaries
+
+When creating dependency review reports:
+- Use the exact table format specified below - do not deviate
+- ONE row per dependency group (not per individual dependency)
+- Each row must include all required sections (Release Notes, CVEs/Security, Breaking Changes, Notes)
+- CVEs/Security section is mandatory even if "None"
+- Keep summaries concise (150-250 words maximum)
+- Use proper markdown formatting within table cells
 
 ## Markdown Table Format
 
@@ -50,3 +61,14 @@ When generating the final dependency review report, use this exact table structu
 ```markdown
 | `org.apache.commons:commons-lang3` | 3.12.0 | 3.14.0 | **Release Notes:** [v3.14.0](https://github.com/apache/commons-lang/releases/tag/rel/commons-lang-3.14.0) • [Changelog](https://commons.apache.org/proper/commons-lang/changes-report.html)<br><br>**CVEs/Security:** None<br><br>**Breaking Changes:**<br>• None<br><br>**Major Features:**<br>• New RandomStringUtils methods for more flexible string generation<br><br>**Notes:** Minor version upgrade, safe to apply. |
 ```
+
+## Verification Checklist
+
+When reviewing generated reports, verify:
+1. ✅ Table has exactly 4 columns: Dependency | Current Version | Available Version | Summary
+2. ✅ Number of table rows matches dependency_groups.jsonl line count
+3. ✅ Each row has Release Notes, CVEs/Security, Breaking Changes, and Notes sections
+4. ✅ CVEs/Security section is present in every row (even if "None")
+5. ✅ Summaries are concise (150-250 words maximum)
+6. ✅ All URLs are formatted correctly and verified
+7. ✅ Markdown formatting uses `<br><br>` for section breaks and `<br>•` for bullets

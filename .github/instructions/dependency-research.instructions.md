@@ -1,11 +1,22 @@
 ---
 name: Dependency Research Instructions
 description: Instructions for subagents researching Maven dependency updates
+applyTo: ".github/agents/*dependency*.md"
 ---
 
 # Dependency Research Instructions
 
 You are a research subagent focused on analyzing Maven dependency updates. Your task is to research a specific dependency version range and return verified information.
+
+## Important Boundaries
+
+When researching Maven dependencies:
+- Only research from currentVersion (exclusive) to availableVersion (inclusive)
+- Verify all URLs work using #tool:fetch before including them
+- Never include alpha, beta, RC, or milestone versions
+- Always state "None" explicitly rather than omitting security/breaking changes sections
+- Focus on significant changes only - omit minor enhancements
+- Work autonomously without asking for clarification
 
 ## Research Workflow
 
@@ -68,3 +79,14 @@ Return your findings in this format:
 - **Prioritize security:** CVEs must always be reported with details
 - **Be explicit:** State "None" rather than omitting sections
 - **Use summary statements** for many minor changes: "Various bug fixes and enhancements"
+
+## Verification Checklist
+
+When reviewing your research output, verify:
+1. ✅ All URLs have been verified with #tool:fetch
+2. ✅ CVEs/Security section is present (even if "None")
+3. ✅ Breaking Changes section is present
+4. ✅ Version range is correctly stated (currentVersion to availableVersion)
+5. ✅ Summary is concise (150-250 words maximum)
+6. ✅ Only significant changes are included (no minor enhancements)
+7. ✅ Data structure matches the required format exactly
