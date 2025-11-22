@@ -6,6 +6,15 @@ applyTo: ".github/**/*.md"
 
 These instructions guide AI agents when writing or modifying GitHub Copilot instructions, custom agents, and prompt files.
 
+## Important Boundaries
+
+When creating or modifying Copilot instruction files:
+- Follow the file type conventions and naming patterns described below
+- Use YAML frontmatter with `applyTo` patterns for instruction files
+- Include concrete examples rather than abstract descriptions
+- Reference existing files instead of duplicating content
+- Keep instructions focused on project-specific information, not generic programming knowledge
+
 ## File Types and Purposes
 
 ### Custom Instructions (`copilot-instructions.md`)
@@ -300,3 +309,14 @@ Follow [Report Format Template](../instructions/report-format.instructions.md)
 - [GitHub Custom Agents Documentation](https://docs.github.com/en/copilot/concepts/agents/coding-agent/about-custom-agents)
 - [VS Code Copilot Customization](https://code.visualstudio.com/docs/copilot/customization/custom-instructions)
 - [How to Write a Great agents.md](https://github.blog/ai-and-ml/github-copilot/how-to-write-a-great-agents-md-lessons-from-over-2500-repositories/)
+
+## Verification Checklist
+
+When reviewing instruction files (including this one), verify:
+1. ✅ YAML frontmatter with appropriate `applyTo` glob pattern
+2. ✅ Clear boundaries section near the top
+3. ✅ Concrete examples for each guideline (not just abstract rules)
+4. ✅ Specific commands, file paths, or patterns (not vague descriptions)
+5. ✅ References to other files instead of duplicated content
+6. ✅ Focus on project-specific information (not generic programming knowledge)
+7. ✅ Success criteria or verification checklist at the end
