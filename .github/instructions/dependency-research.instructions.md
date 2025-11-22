@@ -1,7 +1,7 @@
 ---
 name: Dependency Research Instructions
 description: Instructions for subagents researching Maven dependency updates
-applyTo: ".github/agents/**/*.md"
+applyTo: ".github/agents/*dependency*.md"
 ---
 
 # Dependency Research Instructions

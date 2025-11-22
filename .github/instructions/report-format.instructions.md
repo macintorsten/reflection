@@ -1,7 +1,7 @@
 ---
 name: Report Format Template
 description: Markdown table format for dependency review reports
-applyTo: ".github/agents/**/*.md"
+applyTo: ".github/agents/*dependency*.md"
 ---
 
 # Dependency Review Report Format
