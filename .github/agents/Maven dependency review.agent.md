@@ -32,9 +32,9 @@ You are an orchestrator for Maven dependency reviews. Your role is to coordinate
    - Each line in the output file is a JSON array containing one or more dependencies
    - Dependencies with same groupId and target version are grouped together in a single array for efficient research
 
-### Phase 2: Research & Verify (Sequential Processing)
+### Phase 2: Research & Verify
 
-Process each dependency group sequentially using #tool:runSubagent, updating the report after each group is researched.
+Process each dependency group using #tool:runSubagent, updating the report after each group is researched.
 
 **Subagent Instructions:**
 Each subagent must follow the [Dependency Research Instructions](../instructions/dependency-research.instructions.md).
@@ -62,12 +62,11 @@ Work autonomously. Return structured data when complete.
 
 **Workflow:**
 1. For each dependency group (line in dependency_groups.jsonl):
-   - Launch ONE #tool:runSubagent with the prompt above
+   - Launch #tool:runSubagent with the prompt above
    - Wait for subagent to complete research
    - Immediately append results to the report file (see Phase 3)
    - Continue to next group
-2. Process groups sequentially (NOT in parallel)
-3. This allows the report to be updated incrementally, making progress visible
+2. This allows the report to be updated incrementally, making progress visible
 
 ### Phase 3: Generate and Update Markdown Report Incrementally
 
@@ -144,7 +143,6 @@ After verification:
 ## Key Principles for Orchestration
 
 - **Delegate research:** Use #tool:runSubagent for all dependency research
-- **Sequential processing:** Process dependency groups one at a time (NOT in parallel)
 - **Incremental updates:** Update report immediately after each group is researched
 - **Follow templates:** Use referenced instruction files for structure
 - **One row per group:** Table rows must match dependency_groups.jsonl line count
