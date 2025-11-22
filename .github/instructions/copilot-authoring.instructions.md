@@ -1,6 +1,10 @@
+---
+applyTo: ".github/**/*.{md,agent.md,instructions.md,prompt.md}"
+---
+
 # GitHub Copilot Authoring Best Practices
 
-This guide provides best practices for writing GitHub Copilot instructions, custom agents, and prompt files for this repository.
+These instructions guide AI agents when writing or modifying GitHub Copilot instructions, custom agents, and prompt files.
 
 ## File Types and Purposes
 
@@ -19,7 +23,7 @@ This guide provides best practices for writing GitHub Copilot instructions, cust
 ### Instruction Files (`*.instructions.md`)
 - **Location:** `.github/instructions/FILENAME.instructions.md`
 - **Purpose:** Reusable guidance for specific subtasks
-- **Scope:** Referenced by agents or other instructions
+- **Scope:** Applied based on `applyTo` glob patterns in frontmatter, or referenced by agents
 - **Best for:** Templates, formats, research procedures, validation checklists
 
 ### Prompt Files (`*.prompt.md`)
@@ -75,6 +79,29 @@ You are an expert in [specific domain]. Your role is to [clear purpose].
 - **[Principle]:** [Explanation]
 - **[Principle]:** [Explanation]
 ```
+
+## Instruction File Structure
+
+### YAML Frontmatter with applyTo
+```yaml
+---
+applyTo: "**/*.{ts,tsx}"
+---
+```
+
+**applyTo patterns:**
+- Single pattern: `"**/*.ts"`
+- Multiple extensions: `"**/*.{ts,tsx}"` (use brace expansion, not comma-separated)
+- Specific directory: `"src/**/*.js"`
+- All files: `"**/*"`
+
+### Instruction Body (Markdown)
+
+Follow the same principles as agent bodies:
+- Clear, specific guidance
+- Concrete examples
+- Defined boundaries
+- Referenced formats or templates
 
 ## Writing Effective Instructions
 
