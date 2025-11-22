@@ -4,18 +4,9 @@
 
 Java Spring Boot REST API with PostgreSQL backend and HTML/CSS frontend. Manages "Sample" entities with CRUD operations.
 
-**Stack:** Java 17 | Maven 3.9.11 | Spring Boot 3.x | PostgreSQL 15 | JPA/Hibernate | JUnit 5 + Testcontainers | Jackson JSON
+**Stack:** Java 17 | Maven 3.9.11 | Spring Boot 3.2.1 | PostgreSQL 15 | JPA/Hibernate | JUnit 5 + Testcontainers | Jackson JSON
 
 **Size:** ~10 Java files, ~2,700 lines total
-
-## ⚠️ Critical: Incomplete pom.xml
-
-**`mvn compile` WILL FAIL** - Missing Spring Boot parent and starters in `pom.xml`:
-- Spring Boot parent POM (3.2+)
-- `spring-boot-starter-web`, `-data-jpa`, `-validation`, `-test`
-- PostgreSQL driver, Testcontainers dependencies
-
-**Fix required before ANY code changes:** Add Spring Boot parent + all starters to `pom.xml`
 
 ## Build and Test Instructions
 
@@ -33,13 +24,11 @@ Stop: `docker compose down` | Reset: `docker compose down -v && docker compose u
 
 ### Build Commands
 
-⚠️ **Fix pom.xml first - build currently fails without Spring Boot parent**
-
 ```bash
 mvn clean              # ~3s - removes /target/
-mvn compile            # ~30-60s first run, ~10-20s after
-mvn package            # ~45-90s - runs tests, creates JAR
-mvn clean package      # ~60-120s - full clean build
+mvn compile            # ~15-30s first run, ~5-10s cached
+mvn package            # ~15-30s - runs tests, creates JAR
+mvn clean package      # ~20-40s - full clean build
 ```
 
 ### Running Tests
@@ -47,7 +36,7 @@ mvn clean package      # ~60-120s - full clean build
 **Start database first:** `docker compose up -d`
 
 ```bash
-mvn test  # ~60-90s - 10 integration tests
+mvn test  # ~15-20s - 9 integration tests
 ```
 
 Tests use Testcontainers (separate from docker-compose). Database cleaned before each test (@BeforeEach).
@@ -93,16 +82,16 @@ mvn spring-boot:run     # Start app on :8080
 │           └── SampleControllerIntegrationTest.java  # Integration tests (10 tests)
 ├── .gitignore                      # Java/Maven/IDE ignores
 ├── docker-compose.yml              # PostgreSQL 15 database service
-└── pom.xml                         # Maven configuration (INCOMPLETE - missing Spring Boot)
+└── pom.xml                         # Maven configuration (Spring Boot 3.2.1)
 ```
 
 ### Key Files
 
-**Config:** `pom.xml` (INCOMPLETE) | `application.properties` (DB config) | `docker-compose.yml` (PostgreSQL)
+**Config:** `pom.xml` (Spring Boot 3.2.1) | `application.properties` (DB config) | `docker-compose.yml` (PostgreSQL)
 
 **Core:** `ReflectionApplication.java` (main) | `Sample.java` (JPA entity) | `SampleDTO.java` (validation) | `SampleController.java` (REST) | `SampleRepository.java` (JPA repo)
 
-**Test:** `SampleControllerIntegrationTest.java` (10 tests, Testcontainers)
+**Test:** `SampleControllerIntegrationTest.java` (9 tests, Testcontainers)
 
 ### Architecture
 
@@ -129,9 +118,7 @@ curl http://localhost:8080/api/samples
 
 ## Dependencies
 
-Java 17 | Maven 3.9.11 | Spring 6.1.2 | JUnit 5.8.1 | Jackson 2.16.1 | PostgreSQL 15 | Guava 33.0.0 | Commons Lang3 3.14.0 | SLF4J 2.0.9
-
-**MISSING:** Spring Boot parent, Jakarta EE, Testcontainers
+Java 17 | Maven 3.9.11 | Spring Boot 3.2.1 | Spring 6.2.1 | JUnit 5.10.1 | Jackson 2.15.3 | PostgreSQL 42.7.1 | Testcontainers 1.19.3 | Guava 33.0.0 | Commons Lang3 3.14.0
 
 ## Git Ignore
 
@@ -141,8 +128,8 @@ Excludes: `/target/`, `*.class`, `*.jar`, IDE files (`.idea/`, `.vscode/`, etc.)
 
 ⚠️ **Trust these instructions first** - only search if instructions are incomplete/incorrect
 
-🔧 **Before ANY code changes:** Fix pom.xml → verify `mvn clean compile` → start DB → verify `mvn test`
+🔧 **Before ANY code changes:** Start DB (`docker compose up -d`) → verify `mvn clean compile` → verify `mvn test`
 
-📦 **Timing:** Maven 30-120s first run (downloads), 10-30s after | Tests 60-90s (Testcontainers startup)
+📦 **Timing:** Maven 15-40s for builds | Tests 15-20s (Testcontainers startup included)
 
 🐳 **Use `docker compose` v2** NOT `docker-compose` v1
