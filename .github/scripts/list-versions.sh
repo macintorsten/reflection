@@ -9,6 +9,7 @@ set -euo pipefail
 read -r -d '' TEST_DATA <<'EOF' || true
 com.jayway.jsonpath json-path 2.7.0 2.9.0
 org.apache.commons commons-lang3 3.12.0 3.14.0
+co.elastic.clients elasticsearch-java 8.18.0 8.18.3
 EOF
 
 # Function: Fetch all versions from Maven Central for a given dependency
@@ -18,7 +19,7 @@ fetch_maven_versions() {
   local group_id="$1"
   local artifact_id="$2"
   
-  curl -s "https://search.maven.org/solrsearch/select?q=g:${group_id}+AND+a:${artifact_id}&core=gav&rows=300&wt=json" 2>/dev/null
+  curl -s "https://search.maven.org/solrsearch/select?q=g:${group_id}+AND+a:${artifact_id}&core=gav&rows=150&wt=json" 2>/dev/null
 }
 
 # Function: Extract and filter versions from Maven response
