@@ -109,8 +109,8 @@ Follow the [Dependency Research Instructions](../instructions/dependency-researc
 ```markdown
 **Verification:**
 1. Count groups: `wc -l < dependency_groups.jsonl`
-2. Count table rows: `grep -c '^\|' report.md - 2`
-3. Verify counts match
+2. Count table rows: `grep -c '^\|' report.md`
+3. Verify table rows = groups + 2 (header and separator)
 ```
 
 ## Tool Configuration Best Practices
