@@ -17,7 +17,7 @@ When creating dependency review reports:
 - Use the exact table format specified below - do not deviate
 - ONE row per dependency group (not per individual dependency)
 - Each row must include all required sections (Release Notes, CVEs/Security, Breaking Changes, Notes)
-- CVEs/Security section is mandatory even if "None"
+- CVEs/Security section is mandatory (state "None found in release notes" if applicable)
 - Keep summaries concise (150-250 words maximum)
 - Use proper markdown formatting within table cells
 
@@ -26,17 +26,21 @@ When creating dependency review reports:
 ```markdown
 # Maven Dependency Review - {YYYY-MM-DDTHH-MM-SS}
 
+🤖 **Disclaimer:** This report was automatically generated using AI tools. Please verify all findings before making decisions.
+
 ## Status
-- Total dependencies: N
-- All URLs verified: ✅/❌
-- All version ranges confirmed: ✅/❌ 
-```
+- Total groups: N
+- Groups researched: X / N
+- Research status: ⏳ In progress / ✅ Complete
 
 ## Dependencies to Update
 
 | Dependency | Current Version | Available Version | Summary |
 |------------|-----------------|-------------------|---------|
-| `groupId:artifactId` | X.Y.Z | A.B.C | **Release Notes:** [text](url) • [text](url)<br>**CVEs/Security:** {details or "None"}<br>**Breaking Changes:**<br>• Item 1<br>• Item 2<br>**Major Features:** (only if significant)<br>• Item 1<br>**Notes:** {migration warnings, stability, requirements} |
+```
+
+**Incremental Updates:** Append new table rows at the end. Update Status section as batches complete.
+| `groupId:artifactId` | X.Y.Z | A.B.C | **Release Notes:** [text](url) • [text](url)<br>**CVEs/Security:** {details or "None found in release notes"}<br>**Breaking Changes:**<br>• Item 1<br>• Item 2<br>**Major Features:** (only if significant)<br>• Item 1<br>**Notes:** {migration warnings, stability, requirements} |
 
 ## Column Definitions
 
@@ -45,7 +49,7 @@ When creating dependency review reports:
 3. **Available Version** - Latest stable version available (e.g., 2.20.1)
 4. **Summary** - Structured content with:
    - **Release Notes:** Multiple verified links separated by bullet (•)
-   - **CVEs/Security:** Mandatory section (even if "None")
+   - **CVEs/Security:** Mandatory section (state "None found in release notes" if applicable)
    - **Breaking Changes:** Bullet list of API/behavior changes
    - **Major Features:** Optional, only if transformative
    - **Notes:** Migration complexity, Java requirements, stability warnings, project maintenance status, etc.
@@ -62,7 +66,7 @@ When creating dependency review reports:
 ## Example Row
 
 ```markdown
-| `org.apache.commons:commons-lang3` | 3.12.0 | 3.14.0 | **Release Notes:** [v3.14.0](https://github.com/apache/commons-lang/releases/tag/rel/commons-lang-3.14.0) • [Changelog](https://commons.apache.org/proper/commons-lang/changes-report.html)<br>**CVEs/Security:** None<br>**Breaking Changes:**<br>• None<br>**Major Features:**<br>• New RandomStringUtils methods for more flexible string generation<br>**Notes:** Minor version upgrade, safe to apply. |
+| `org.apache.commons:commons-lang3` | 3.12.0 | 3.14.0 | **Release Notes:** [v3.14.0](https://github.com/apache/commons-lang/releases/tag/rel/commons-lang-3.14.0) • [Changelog](https://commons.apache.org/proper/commons-lang/changes-report.html)<br>**CVEs/Security:** None found in release notes<br>**Breaking Changes:**<br>• None<br>**Major Features:**<br>• New RandomStringUtils methods for more flexible string generation<br>**Notes:** Minor version upgrade, safe to apply. |
 ```
 
 ## Verification Checklist
@@ -71,7 +75,7 @@ When reviewing generated reports, verify:
 1. ✅ Table has exactly 4 columns: Dependency | Current Version | Available Version | Summary
 2. ✅ Number of table rows matches dependency_groups.jsonl line count
 3. ✅ Each row has Release Notes, CVEs/Security, Breaking Changes, and Notes sections
-4. ✅ CVEs/Security section is present in every row (even if "None")
-5. ✅ Summaries are concise (150-250 words maximum)
-6. ✅ All URLs are formatted correctly and verified
+4. ✅ CVEs/Security section is present in every row (stating "None found in release notes" if applicable)
+5. ✅ Summaries in the table are concise (150-250 words maximum)
+6. ✅ All URLs are formatted correctly and verified, encompassing relevant release notes and changelogs
 7. ✅ Markdown formatting uses `<br>` for line breaks and `<br>•` for bullets

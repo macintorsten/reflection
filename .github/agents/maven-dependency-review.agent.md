@@ -1,12 +1,7 @@
 ---
 name: Maven-Dependency-Review
-description: Maven dependency review prioritizing security (CVEs), breaking changes, and major features with verified release notes
-tools: ['runCommands', 'edit', 'search', 'changes', 'openSimpleBrowser', 'fetch', 'todos']
-handoffs:
-  - label: Update Dependencies
-    agent: maven-dependency-update
-    prompt: Update these dependencies in pom.xml
-    send: false
+description: Maven dependency review prioritizing breaking changes, major features, and verified release notes (security info if available)
+tools: ['runCommands', 'edit', 'search', 'changes', 'openSimpleBrowser', 'fetch', 'todos', 'runSubagent']
 ---
 
 # Maven Dependency Review
@@ -18,11 +13,9 @@ Create a plan with a corresponding todo-list for process described below and the
 ## Important Boundaries
 
 - Focus on orchestration only, delegate detailed research to subagents
-- **Batch 3-5 dependency groups per subagent call** (subagent handles 1-10 dependencies per request)
+- **Batch 3-5 dependency groups per subagent call** (each group can have multiple dependencies)
 - Never auto-update dependencies without user approval
-- Only suggest updates with verified release notes
-- Skip alpha, beta, RC, and milestone versions
-- Always include CVEs/Security section in reports (even if "None")
+- Always include CVEs/Security section in reports (stating "None found in release notes" if applicable)
 - Generate reports incrementally to show progress
 
 ## Process Overview
@@ -76,8 +69,15 @@ Research from currentVersion (exclusive) to availableVersion (inclusive).
 1. Batch 3-5 dependency groups from `$GROUPS_FILE`
 2. Call `runSubagent` with batched groups
 3. Receive research results covering all groups in batch
+5. Save the raw output from the subagent for later use (see Phase 4)
 4. Append results to report file (see Phase 3)
-5. Continue with next batch
+6. Continue with next batch
+
+**Error Handling:**
+If subagent returns no output or incomplete data:
+- Append placeholder row: `| groupId:artifactId | X.Y.Z | A.B.C | ⏳ Research incomplete - manual review needed |`
+- Log the failure
+- Continue with next batch (do not block on failures)
 
 ### Phase 3: Generate and Update Markdown Report Incrementally
 
@@ -87,22 +87,29 @@ Research from currentVersion (exclusive) to availableVersion (inclusive).
 Create at START of Phase 2 following [Report Format Template](../instructions/report-format.instructions.md).
 
 **Incremental Updates:**
-After each batch completes:
-1. Parse subagent's returned data for all groups in batch
-2. Format each group as table row following [Report Format Template](../instructions/report-format.instructions.md)
-3. Insert rows into table (before "## Verification Status" section)
 
-### Phase 4: Final Verification
+After each batch completes:
+
+0. Save subagent raw output for Phase 4
+1. Parse subagent's returned structured data (## Dependency: sections)
+2. For each dependency group, append a new row in the markdown table as described in [Table Row Template](../instructions/maven-dependency-review-table-row.instructions.md)
+3. Update Status section with progress
+
+### Phase 4: Append research agent raw outpu
+
+After all batches complete, append the full raw output from the research subagent to the end of the markdown report for transparency.
+
+### Phase 5: Final Verification
 
 1. Count groups: `wc -l < "$GROUPS_FILE"` 
 2. Count table rows: `grep -c '^\|' {report-file}` minus 2 (header/separator)
 3. Verify counts match (critical: must be equal)
-4. Run `lychee --format json {report-file}` to check URLs
+4. Run `lychee --format json {report-file}` to check URLs, fallback to `curl` or `Invoke-WebRequest`
 5. Validate each row has CVEs/Security section and release notes URLs
 6. If broken links found, re-research those groups and update report
 7. Update markdown file with final verification status
 
-**Note:** Verification uses info already in report - no re-downloading unless fixing broken links.
+**Note:** Verification uses info already in report - no re-downloading unless checking and fixing broken links.
 
 ## Key Principles
 
@@ -111,5 +118,4 @@ After each batch completes:
 - **Follow templates:** Use referenced instruction files for structure
 - **One row per group:** Table rows must match JSONL line count
 - **Security first:** Every row needs CVEs/Security section
-- **Show results:** Open preview and summarize when complete
-- **Handoff for updates:** After review complete, present "Update Dependencies" button to apply changes to pom.xml
+- **Raw output full transparency:** Append the full raw output from the research subagent to the end of the markdown report for transparency

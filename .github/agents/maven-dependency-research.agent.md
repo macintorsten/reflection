@@ -1,6 +1,6 @@
 ---
 name: maven-dependency-research
-description: Research Maven dependency updates with security analysis, breaking changes, and verified release notes
+description: Research Maven dependency updates with breaking changes, verified release notes, and security info if available
 tools: ['runCommands', 'search', 'fetch']
 ---
 

@@ -1,7 +1,7 @@
 ---
 name: Maven-Dependency-Update
 description: Updates Maven dependencies in pom.xml based on approved dependency review reports
-tools: ['runCommands', 'edit', 'search']
+tools: ['runCommands', 'edit', 'search', 'changes', 'fetch', 'todos', 'runSubagent']
 ---
 
 # Maven Dependency Update Agent
