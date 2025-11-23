@@ -3,9 +3,9 @@ name: Maven-Dependency-Review
 description: Maven dependency review prioritizing security (CVEs), breaking changes, and major features with verified release notes
 tools: ['runCommands', 'edit', 'search', 'changes', 'openSimpleBrowser', 'fetch', 'todos']
 handoffs:
-  - label: Research Dependency
-    agent: maven-dependency-research
-    prompt: Research these dependency groups
+  - label: Update Dependencies
+    agent: maven-dependency-update
+    prompt: Update these dependencies in pom.xml
     send: false
 ---
 
@@ -47,19 +47,19 @@ Each line is a JSON array of dependencies sharing the same `groupId` and `availa
 ### Phase 2: Research & Verify
 
 **Batching Strategy:**
-Read 3-5 lines from `$GROUPS_FILE` at a time, then hand off to `@maven-dependency-research` agent with all groups combined.
+Read 3-5 lines from `$GROUPS_FILE` at a time, then use `runSubagent` to research dependencies.
 
 ```bash
 # Read in batches of 3-5 lines
 while IFS= read -r line1 && IFS= read -r line2 && IFS= read -r line3; do
   # Combine 3 groups (can do 4-5 if desired)
   # Each line is already a JSON array of dependencies
-  # Hand off all groups to research agent together
+  # Use runSubagent to research all groups together
 done < "$GROUPS_FILE"
 ```
 
-**Handoff to Research Agent:**
-Present batched groups to user with "Research Dependency" button:
+**Subagent Research:**
+Use `runSubagent` with `maven-dependency-research` agent, passing batched groups:
 
 ```
 Research Maven dependency updates for the following groups:
@@ -74,8 +74,8 @@ Research from currentVersion (exclusive) to availableVersion (inclusive).
 
 **Workflow:**
 1. Batch 3-5 dependency groups from `$GROUPS_FILE`
-2. Present to user with "Research Dependency" handoff button
-3. Wait for research results covering all groups in batch
+2. Call `runSubagent` with batched groups
+3. Receive research results covering all groups in batch
 4. Append results to report file (see Phase 3)
 5. Continue with next batch
 
@@ -112,3 +112,4 @@ After each batch completes:
 - **One row per group:** Table rows must match JSONL line count
 - **Security first:** Every row needs CVEs/Security section
 - **Show results:** Open preview and summarize when complete
+- **Handoff for updates:** After review complete, present "Update Dependencies" button to apply changes to pom.xml

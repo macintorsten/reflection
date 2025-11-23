@@ -26,17 +26,17 @@ When creating dependency review reports:
 ```markdown
 # Maven Dependency Review - {YYYY-MM-DDTHH-MM-SS}
 
+## Status
+- Total dependencies: N
+- All URLs verified: ✅/❌
+- All version ranges confirmed: ✅/❌ 
+```
+
 ## Dependencies to Update
 
 | Dependency | Current Version | Available Version | Summary |
 |------------|-----------------|-------------------|---------|
 | `groupId:artifactId` | X.Y.Z | A.B.C | **Release Notes:** [text](url) • [text](url)<br>**CVEs/Security:** {details or "None"}<br>**Breaking Changes:**<br>• Item 1<br>• Item 2<br>**Major Features:** (only if significant)<br>• Item 1<br>**Notes:** {migration warnings, stability, requirements} |
-
-## Verification Status
-- Total dependencies: N
-- All URLs verified: ✅
-- All version ranges confirmed: ✅
-```
 
 ## Column Definitions
 
@@ -48,11 +48,11 @@ When creating dependency review reports:
    - **CVEs/Security:** Mandatory section (even if "None")
    - **Breaking Changes:** Bullet list of API/behavior changes
    - **Major Features:** Optional, only if transformative
-   - **Notes:** Migration complexity, Java requirements, stability warnings
+   - **Notes:** Migration complexity, Java requirements, stability warnings, project maintenance status, etc.
 
 ## Table Formatting Rules
 
-- Use `<br><br>` for line breaks within table cells
+- Use `<br>` for line breaks within table cells
 - Use `<br>•` for bullet points within cells
 - Wrap dependency coordinates in backticks for monospace
 - Use bold (`**text:**`) for section headers in Summary column
@@ -62,7 +62,7 @@ When creating dependency review reports:
 ## Example Row
 
 ```markdown
-| `org.apache.commons:commons-lang3` | 3.12.0 | 3.14.0 | **Release Notes:** [v3.14.0](https://github.com/apache/commons-lang/releases/tag/rel/commons-lang-3.14.0) • [Changelog](https://commons.apache.org/proper/commons-lang/changes-report.html)<br><br>**CVEs/Security:** None<br><br>**Breaking Changes:**<br>• None<br><br>**Major Features:**<br>• New RandomStringUtils methods for more flexible string generation<br><br>**Notes:** Minor version upgrade, safe to apply. |
+| `org.apache.commons:commons-lang3` | 3.12.0 | 3.14.0 | **Release Notes:** [v3.14.0](https://github.com/apache/commons-lang/releases/tag/rel/commons-lang-3.14.0) • [Changelog](https://commons.apache.org/proper/commons-lang/changes-report.html)<br>**CVEs/Security:** None<br>**Breaking Changes:**<br>• None<br>**Major Features:**<br>• New RandomStringUtils methods for more flexible string generation<br>**Notes:** Minor version upgrade, safe to apply. |
 ```
 
 ## Verification Checklist
@@ -74,4 +74,4 @@ When reviewing generated reports, verify:
 4. ✅ CVEs/Security section is present in every row (even if "None")
 5. ✅ Summaries are concise (150-250 words maximum)
 6. ✅ All URLs are formatted correctly and verified
-7. ✅ Markdown formatting uses `<br><br>` for section breaks and `<br>•` for bullets
+7. ✅ Markdown formatting uses `<br>` for line breaks and `<br>•` for bullets
