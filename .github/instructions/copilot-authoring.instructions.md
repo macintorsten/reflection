@@ -138,7 +138,7 @@ Include code samples, expected outputs, and file formats:
 ### Reference Existing Files
 Instead of duplicating information, reference other instruction files:
 ```markdown
-Follow the [Dependency Research Instructions](../instructions/dependency-research.instructions.md).
+Follow the [Maven Dependency Research Instructions](../instructions/maven-dependency-research.instructions.md).
 ```
 
 ### Define Success Criteria

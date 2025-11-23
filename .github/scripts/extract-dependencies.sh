@@ -8,9 +8,14 @@ set -euo pipefail
 # Function: Extract dependencies from Maven
 # Returns: Newline-separated JSON objects
 extract_maven_dependencies() {
+  # -DallowMajorUpdates=false: Only show minor and patch updates (no major version jumps)
+  # -Dmaven.version.ignore: Filter out pre-release versions
+  #   Covers: alpha, Alpha, ALPHA, beta, Beta, BETA, rc, RC, 
+  #           milestone, Milestone, MILESTONE, snapshot, SNAPSHOT, M1-M9, CR1-CR9
+  #   Supports both dash (-) and dot (.) separators: 1.0-Beta2 and 1.0.Beta2
   mvn versions:display-dependency-updates -B -Dversions.outputLineWidth=240 \
     -DallowMajorUpdates=false \
-    -Dmaven.version.ignore=".*-alpha.*,.*-beta.*,.*-rc.*,.*-RC.*,.*-M[0-9]+.*,.*\.CR[0-9]+.*" \
+    -Dmaven.version.ignore=".*[-.]alpha.*,.*[-.]Alpha.*,.*[-.]ALPHA.*,.*[-.]beta.*,.*[-.]Beta.*,.*[-.]BETA.*,.*[-.]rc.*,.*[-.]RC.*,.*[-.]milestone.*,.*[-.]Milestone.*,.*[-.]MILESTONE.*,.*[-.]snapshot.*,.*[-.]SNAPSHOT.*,.*-M[0-9]+.*,.*\.CR[0-9]+.*" \
     2>/dev/null \
     | sort -u \
     | awk '/^\[INFO\]   [a-z].*:/ {
@@ -41,7 +46,7 @@ main() {
   
   local groups_file="$1"
   
-  echo "Extracting Maven dependency updates..." >&2
+  echo "Extracting Maven dependency updates (minor/patch only, excluding pre-releases)..." >&2
   local dependencies
   dependencies=$(extract_maven_dependencies)
   

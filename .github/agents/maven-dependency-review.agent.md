@@ -1,7 +1,12 @@
 ---
 name: Maven-Dependency-Review
 description: Maven dependency review prioritizing security (CVEs), breaking changes, and major features with verified release notes
-tools: ['runCommands', 'edit', 'search', 'todos', 'runSubagent', 'openSimpleBrowser', 'fetch']
+tools: ['runCommands', 'edit', 'search', 'changes', 'openSimpleBrowser', 'fetch', 'todos']
+handoffs:
+  - label: Research Dependency
+    agent: maven-dependency-research
+    prompt: Research these dependency groups
+    send: false
 ---
 
 # Maven Dependency Review
@@ -12,8 +17,8 @@ Create a plan with a corresponding todo-list for process described below and the
 
 ## Important Boundaries
 
-When conducting Maven dependency reviews:
-- Focus on orchestration only - delegate detailed research to subagents
+- Focus on orchestration only, delegate detailed research to subagents
+- **Batch 3-5 dependency groups per subagent call** (subagent handles 1-10 dependencies per request)
 - Never auto-update dependencies without user approval
 - Only suggest updates with verified release notes
 - Skip alpha, beta, RC, and milestone versions
@@ -33,139 +38,77 @@ GROUPS_FILE="dependency-review-${TIMESTAMP}.jsonl"
 ```
 
 **JSONL Structure:**
-Each line is a JSON array containing a group of related dependencies:
-- All dependencies in the array share the same `groupId` and `availableVersion`
-- Each dependency object contains:
-  - `groupId`: Maven group identifier
-  - `artifactId`: Maven artifact name
-  - `currentVersion`: Current version (exclusive in research range)
-  - `availableVersion`: Target version (inclusive in research range)
+Each line is a JSON array of dependencies sharing the same `groupId` and `availableVersion`:
 
-**Example:**
 ```json
-[{"groupId":"org.springframework","artifactId":"spring-core","currentVersion":"5.3.0","availableVersion":"5.3.5"},{"groupId":"org.springframework","artifactId":"spring-context","currentVersion":"5.3.0","availableVersion":"5.3.5"}]
+[{"groupId":"org.springframework","artifactId":"spring-core","currentVersion":"5.3.0","availableVersion":"5.3.5"}]
 ```
 
 ### Phase 2: Research & Verify
 
-Process each dependency group using #tool:runSubagent, updating the report after each group is researched.
+**Batching Strategy:**
+Read 3-5 lines from `$GROUPS_FILE` at a time, then hand off to `@maven-dependency-research` agent with all groups combined.
 
-**Reading the JSONL file:**
 ```bash
-# Each line is a JSON array - process line by line
-while IFS= read -r group_json; do
-  # Parse the array and delegate to subagent
-  # group_json is already a JSON array of dependencies
+# Read in batches of 3-5 lines
+while IFS= read -r line1 && IFS= read -r line2 && IFS= read -r line3; do
+  # Combine 3 groups (can do 4-5 if desired)
+  # Each line is already a JSON array of dependencies
+  # Hand off all groups to research agent together
 done < "$GROUPS_FILE"
 ```
 
-**Subagent Instructions:**
-Each subagent must follow the [Dependency Research Instructions](../instructions/dependency-research.instructions.md).
+**Handoff to Research Agent:**
+Present batched groups to user with "Research Dependency" button:
 
-**Your prompt to each subagent:**
 ```
-Research Maven dependency updates for the following group (JSON array of dependencies):
-{group_json}
+Research Maven dependency updates for the following groups:
 
-All dependencies in this array share the same groupId and are upgrading to the same availableVersion.
-For each dependency, research from currentVersion (exclusive) to availableVersion (inclusive).
+Group 1: {line1_json}
+Group 2: {line2_json}
+Group 3: {line3_json}
 
-Follow the Dependency Research Instructions in ../instructions/dependency-research.instructions.md.
-
-Return findings for ALL dependencies in the group in the specified data structure with:
-- Verified release notes URLs (check with #tool:fetch)
-- CVEs/Security section (mandatory, even if "None")  
-- Breaking changes (all API/behavior/requirement changes)
-- Major features (only if transformative)
-- Notes (migration warnings, Java requirements, stability)
-
-Work autonomously. Return structured data when complete.
+Each group shares the same groupId and availableVersion.
+Research from currentVersion (exclusive) to availableVersion (inclusive).
 ```
-
-**Note:** Dependencies grouped together share the same groupId and target version, so they can often be researched from the same release notes source.
 
 **Workflow:**
-1. For each dependency group (line in `$GROUPS_FILE`):
-   - Launch #tool:runSubagent with the prompt above
-   - Wait for subagent to complete research
-   - Immediately append results to the report file (see Phase 3)
-   - Continue to next group
-2. This allows the report to be updated incrementally, making progress visible
+1. Batch 3-5 dependency groups from `$GROUPS_FILE`
+2. Present to user with "Research Dependency" handoff button
+3. Wait for research results covering all groups in batch
+4. Append results to report file (see Phase 3)
+5. Continue with next batch
 
 ### Phase 3: Generate and Update Markdown Report Incrementally
 
-Create timestamped markdown file in **root directory** at the START of Phase 2, using the format defined in [Report Format Template](../instructions/report-format.instructions.md).
-
-**Report Location:** `/workspace/dependency-review-YYYY-MM-DDTHH-MM-SS.md` (root directory)
-**JSONL Location:** `/workspace/dependency-review-YYYY-MM-DDTHH-MM-SS.jsonl` (same timestamp, root directory)
+**Report Location:** `/workspace/dependency-review-${TIMESTAMP}.md` (root directory)
 
 **Initial Report Structure:**
-1. Use the same `$TIMESTAMP` from Phase 1
-2. Create markdown file: `dependency-review-${TIMESTAMP}.md`
-3. Initialize with header and empty table:
-   ```markdown
-   # Maven Dependency Review - {timestamp}
-   
-   ## Dependencies to Update
-   
-   | Dependency | Current Version | Available Version | Summary |
-   |------------|-----------------|-------------------|---------|
-   
-   ## Verification Status
-   - Total dependencies: {count from $GROUPS_FILE}
-   - Research in progress...
-   ```
+Create at START of Phase 2 following [Report Format Template](../instructions/report-format.instructions.md).
 
 **Incremental Updates:**
-After each subagent completes in Phase 2:
-1. Parse subagent's returned data
-2. Format as table row following [Report Format Template](../instructions/report-format.instructions.md)
-3. Insert row into table (before "## Verification Status" section)
-4. This ensures the report is always up-to-date with latest research
-
-**Final Format:**
-At end of Phase 2, the report will be complete with all dependency rows populated.
-
-**Critical Rules:**
-- ONE table row per dependency group (same as lines in `$GROUPS_FILE`)
-- If group has multiple dependencies (e.g., spring-beans, spring-context, spring-core), create ONE row listing all artifacts
-- Table has 4 columns: Dependency | Current Version | Available Version | Summary
-- For grouped dependencies, list all artifacts in Dependency column separated by `<br>`
-- Summary contains: Release Notes, CVEs/Security, Breaking Changes, Major Features, Notes
-- Use `<br><br>` for section breaks, `<br>•` for bullets within cells
-- Separate multiple release notes URLs with bullet character (•)
-- Keep summaries concise (max 150-250 words per row, shorter is fine)
-- Each row is added to the report IMMEDIATELY after research completes (incremental updates)
+After each batch completes:
+1. Parse subagent's returned data for all groups in batch
+2. Format each group as table row following [Report Format Template](../instructions/report-format.instructions.md)
+3. Insert rows into table (before "## Verification Status" section)
 
 ### Phase 4: Final Verification
 
-Launch verification #tool:runSubagent to:
+1. Count groups: `wc -l < "$GROUPS_FILE"` 
+2. Count table rows: `grep -c '^\|' {report-file}` minus 2 (header/separator)
+3. Verify counts match (critical: must be equal)
+4. Run `lychee --format json {report-file}` to check URLs
+5. Validate each row has CVEs/Security section and release notes URLs
+6. If broken links found, re-research those groups and update report
+7. Update markdown file with final verification status
 
-1. Read generated markdown report file
-2. Count groups: `wc -l < "$GROUPS_FILE"`
-3. Count table rows: `grep -c '^\|' {report-file} - 2` (subtract 2 for header/separator)
-4. Verify counts match (critical: must be equal)
-5. Run `lychee --format json {report-file}` to check URLs (fallback to curl/wget on Linux, Invoke-WebRequest on Windows if lychee unavailable)
-6. Validate each row has:
-   - At least one release notes URL
-   - CVEs/Security section (even if "None")
-   - Breaking changes clearly marked
-   - Summaries concise (150-250 words)
-   - All mentioned versions fall within range: currentVersion (exclusive) to availableVersion (inclusive)
-7. If broken links found, launch new research subagent for those groups and update the report
-8. Update markdown file with final verification status
+**Note:** Verification uses info already in report - no re-downloading unless fixing broken links.
 
-**Important: Verification uses info already in report - no re-downloading release notes unless fixing broken links.**
+## Key Principles
 
-**Note:** The JSONL file (`dependency-review-${TIMESTAMP}.jsonl`) is kept alongside the markdown report for reference and potential re-processing.
-
-## Key Principles for Orchestration
-
-- **Delegate research:** Use #tool:runSubagent for all dependency research
-- **Incremental updates:** Update report immediately after each group is researched
+- **Batch research:** Send 3-5 groups per subagent call for efficiency
+- **Incremental updates:** Update report after each batch completes
 - **Follow templates:** Use referenced instruction files for structure
-- **One row per group:** Table rows must match JSONL file line count
-- **Check thoroughly:** Run lychee on final report, verify counts match
+- **One row per group:** Table rows must match JSONL line count
 - **Security first:** Every row needs CVEs/Security section
-- **Show results:** Open preview and summarize
-- **Use pattern cache:** Pass previous report path to subagents for faster lookups
+- **Show results:** Open preview and summarize when complete
