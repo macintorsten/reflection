@@ -14,7 +14,10 @@ public class ErrorResponse {
     @Schema(description = "Timestamp when error occurred (ISO-8601)")
     public String timestamp;
 
-    @Schema(description = "List of field-level validation errors")
+    @io.swagger.v3.oas.annotations.media.ArraySchema(
+            schema = @Schema(implementation = FieldError.class),
+            arraySchema = @Schema(description = "List of field-level validation errors (null for non-validation errors)", nullable = true)
+    )
     public List<FieldError> fieldErrors;
 
     public ErrorResponse(String message, int status, String timestamp) {

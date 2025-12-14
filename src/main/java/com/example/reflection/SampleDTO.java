@@ -1,11 +1,13 @@
 package com.example.reflection;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Max;
 import io.swagger.v3.oas.annotations.media.Schema;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class SampleDTO {
 
     @Schema(description = "Text value", example = "Hello World")

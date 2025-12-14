@@ -18,317 +18,19 @@
         <java.version>21</java.version>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
-        <jackson.version>2.20.1</jackson.version>
-        <micrometer.version>1.16.0</micrometer.version>
-        <micrometer-tracing.version>1.6.0</micrometer-tracing.version>
-        <netty.version>4.2.7.Final</netty.version>
-        <jetty.version>12.1.4</jetty.version>
-        <log4j.version>2.25.2</log4j.version>
-        <kotlin.version>2.2.21</kotlin.version>
-        <brave.version>6.3.0</brave.version>
-        <opentelemetry.version>1.56.0</opentelemetry.version>
-        <selenium.version>4.38.0</selenium.version>
-        <mockito.version>5.20.0</mockito.version>
-        <prometheus.version>1.4.3</prometheus.version>
-        <mongodb.version>5.6.1</mongodb.version>
-        <reactor.version>2025.0.0</reactor.version>
-        <pulsar.version>4.1.2</pulsar.version>
-        <artemis.version>2.44.0</artemis.version>
-        <oracle.version>23.26.0.0.0</oracle.version>
-        <activemq.version>6.2.0</activemq.version>
-        <kotlinx-coroutines.version>1.10.2</kotlinx-coroutines.version>
-        <kotlinx-serialization.version>1.9.0</kotlinx-serialization.version>
-        <xmlunit.version>2.11.0</xmlunit.version>
+        <guava.version>33.0.0-jre</guava.version>
+        <commons-lang3.version>3.14.0</commons-lang3.version>
     </properties>
-
-    <dependencyManagement>
-        <dependencies>
-            <!-- Override Jackson version from Spring Boot -->
-            <dependency>
-                <groupId>com.fasterxml.jackson</groupId>
-                <artifactId>jackson-bom</artifactId>
-                <version>${jackson.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <!-- Micrometer BOM -->
-            <dependency>
-                <groupId>io.micrometer</groupId>
-                <artifactId>micrometer-bom</artifactId>
-                <version>${micrometer.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <!-- Lock versions for large dependency groups -->
-            <dependency>
-                <groupId>io.netty</groupId>
-                <artifactId>netty-bom</artifactId>
-                <version>${netty.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-bom</artifactId>
-                <version>${jetty.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j-bom</artifactId>
-                <version>${log4j.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.jetbrains.kotlin</groupId>
-                <artifactId>kotlin-bom</artifactId>
-                <version>${kotlin.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>io.zipkin.brave</groupId>
-                <artifactId>brave-bom</artifactId>
-                <version>${brave.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>io.opentelemetry</groupId>
-                <artifactId>opentelemetry-bom</artifactId>
-                <version>${opentelemetry.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.seleniumhq.selenium</groupId>
-                <artifactId>selenium-bom</artifactId>
-                <version>${selenium.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.mockito</groupId>
-                <artifactId>mockito-bom</artifactId>
-                <version>${mockito.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>io.prometheus</groupId>
-                <artifactId>prometheus-metrics-bom</artifactId>
-                <version>${prometheus.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.mongodb</groupId>
-                <artifactId>mongodb-driver-bom</artifactId>
-                <version>${mongodb.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>io.projectreactor</groupId>
-                <artifactId>reactor-bom</artifactId>
-                <version>${reactor.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>io.micrometer</groupId>
-                <artifactId>micrometer-tracing-bom</artifactId>
-                <version>${micrometer-tracing.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.pulsar</groupId>
-                <artifactId>pulsar-bom</artifactId>
-                <version>${pulsar.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.activemq</groupId>
-                <artifactId>artemis-bom</artifactId>
-                <version>${artemis.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.oracle.database.jdbc</groupId>
-                <artifactId>ojdbc-bom</artifactId>
-                <version>${oracle.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.activemq</groupId>
-                <artifactId>activemq-bom</artifactId>
-                <version>${activemq.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.jetbrains.kotlinx</groupId>
-                <artifactId>kotlinx-coroutines-bom</artifactId>
-                <version>${kotlinx-coroutines.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.jetbrains.kotlinx</groupId>
-                <artifactId>kotlinx-serialization-bom</artifactId>
-                <version>${kotlinx-serialization.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.xmlunit</groupId>
-                <artifactId>xmlunit-bom</artifactId>
-                <version>${xmlunit.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <dependencies>
         <!-- Spring Boot Starters -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-            <exclusions>
-                <!-- Exclude unused embedded servers and connectors -->
-                <exclusion>
-                    <groupId>io.undertow</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <!-- Exclude unused caching providers -->
-                <exclusion>
-                    <groupId>com.hazelcast</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.ehcache</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.infinispan.protostream</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <!-- Exclude unused NoSQL clients -->
-                <exclusion>
-                    <groupId>com.couchbase.client</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>co.elastic.clients</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.elasticsearch.client</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>io.lettuce</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>redis.clients</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <!-- Exclude unused messaging clients -->
-                <exclusion>
-                    <groupId>com.rabbitmq</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.pulsar</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <!-- Exclude unused utility libraries -->
-                <exclusion>
-                    <groupId>commons-codec</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.yaml</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.jetbrains.kotlin</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
-            <exclusions>
-                <!-- Exclude unused database drivers -->
-                <exclusion>
-                    <groupId>com.h2database</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.derby</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.oracle.database.jdbc</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.oracle.database.ha</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.oracle.database.nls</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.oracle.database.security</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.oracle.database.xml</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.hsqldb</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.xerial</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <!-- Exclude unused database migration tools -->
-                <exclusion>
-                    <groupId>org.flywaydb</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.liquibase</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <!-- Exclude unused data access libraries -->
-                <exclusion>
-                    <groupId>org.jooq</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>io.r2dbc</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -346,63 +48,43 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>33.0.0-jre</version>
+            <version>${guava.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.14.0</version>
+            <version>${commons-lang3.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
             <artifactId>httpclient5</artifactId>
-            <!-- Use Spring Boot managed version -->
         </dependency>
-        <!-- Remove explicit httpcore dependencies to avoid conflicts with Spring Boot managed versions -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.30</version>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>2.0.9</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.16.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-            <version>2.16.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-            <version>2.16.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <version>5.7.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.assertj</groupId>
-            <artifactId>assertj-core</artifactId>
-            <version>3.24.2</version>
-            <scope>test</scope>
         </dependency>
 
         <!-- OpenAPI / Swagger -->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>2.4.0</version>
+            <version>2.8.8</version>
+        </dependency>
+
+        <!-- JSON Schema validation (RestAssured approach - simpler than NetworkNT) -->
+        <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>json-schema-validator</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- NetworkNT json-schema-validator (alternative lower-level approach) -->
+        <dependency>
+            <groupId>com.networknt</groupId>
+            <artifactId>json-schema-validator</artifactId>
+            <version>1.5.5</version>
+            <scope>test</scope>
         </dependency>
 
         <!-- Test dependencies -->
@@ -410,29 +92,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
-            <exclusions>
-                <!-- Exclude unused test frameworks -->
-                <exclusion>
-                    <groupId>org.junit.vintage</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.xmlunit</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.awaitility</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.seleniumhq.selenium</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.htmlunit</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
@@ -464,6 +123,44 @@
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-maven-plugin</artifactId>
+                <version>1.4</version>
+                <executions>
+                    <execution>
+                        <id>generate-openapi</id>
+                        <phase>integration-test</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <apiDocsUrl>http://localhost:8080/v3/api-docs</apiDocsUrl>
+                    <outputFileName>openapi-spec.json</outputFileName>
+                    <outputDir>${project.basedir}/src/test/resources</outputDir>
+                    <skip>false</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>pre-integration-test</id>
+                        <goals>
+                            <goal>start</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>post-integration-test</id>
+                        <goals>
+                            <goal>stop</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

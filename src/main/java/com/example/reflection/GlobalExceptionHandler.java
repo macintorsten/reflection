@@ -5,14 +5,25 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Global exception handler for consistent error responses across the application.
+ * Catches validation exceptions and generic errors, returning structured ErrorResponse objects.
+ */
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    /**
+     * Handles validation exceptions from @Valid bean validation.
+     * Returns 400 Bad Request with detailed field-level error information.
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException ex) {
         List<ErrorResponse.FieldError> fieldErrors = new ArrayList<>();
         
@@ -33,7 +44,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(errorResponse);
     }
 
+    /**
+     * Handles all other uncaught exceptions.
+     * Returns 500 Internal Server Error with error details.
+     */
     @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
         ErrorResponse errorResponse = new ErrorResponse(
             ex.getMessage() != null ? ex.getMessage() : "An unexpected error occurred",
