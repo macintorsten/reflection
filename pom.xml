@@ -18,7 +18,7 @@
         <java.version>21</java.version>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
-        <guava.version>33.0.0-jre</guava.version>
+        <guava.version>33.5.0-jre</guava.version>
         <commons-lang3.version>3.20.0</commons-lang3.version>
     </properties>
 
