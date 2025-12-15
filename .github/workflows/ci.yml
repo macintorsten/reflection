@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request: 
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up JDK 21
+      uses: actions/setup-java@v4
+      with: 
+        java-version: '21'
+        distribution: 'temurin'
+        cache: 'maven'
+    
+    - name: Run tests with Maven
+      run: mvn clean verify
+      
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with: 
+        name: test-results
+        path: |
+          **/target/surefire-reports/
+          **/target/failsafe-reports/
+    
+    # Auto-merge Dependabot PRs (currently disabled)
+    # Uncomment the steps below to automatically merge Dependabot PRs that pass all tests
+    # - name: Enable auto-merge for Dependabot PRs
+    #   if: github.actor == 'dependabot[bot]' && success()
+    #   run: gh pr merge --auto --squash "${{ github.event.pull_request.html_url }}"
+    #   env:
+    #     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
