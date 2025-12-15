@@ -8,6 +8,7 @@ A Java Spring Boot REST API project with PostgreSQL backend, demonstrating:
 - Testcontainers for integration testing
 - OpenAPI/Swagger documentation
 - GitHub Actions CI/CD
+- Static API documentation on GitHub Pages
 
 ## Building and Testing
 
@@ -35,8 +36,14 @@ The application will be available at http://localhost:8080
 ### API Endpoints
 - `POST /api/samples` - Create a new sample
 - `GET /api/samples` - List all samples
-- `GET /swagger-ui.html` - Swagger UI documentation
-- `GET /v3/api-docs` - OpenAPI specification
+- `GET /swagger-ui.html` - Interactive Swagger UI (when app is running)
+- `GET /v3/api-docs` - OpenAPI specification (when app is running)
+
+### API Documentation
+
+Static API documentation is available at: **https://macintorsten.github.io/reflection/**
+
+The documentation is automatically generated from OpenAPI annotations in the code and published to GitHub Pages. Note that the "Try it out" functionality is disabled in the static version since there's no running server backend.
 
 ## Testing
 

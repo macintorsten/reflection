@@ -1,0 +1,248 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "Reflection API",
+        "description": "CRUD operations for Sample entities",
+        "license": {
+            "name": "Unspecified",
+            "url": "https://example.com"
+        },
+        "version": "v1"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8080",
+            "description": "Generated server url"
+        }
+    ],
+    "tags": [
+        {
+            "name": "Samples",
+            "description": "Operations on Sample resources"
+        }
+    ],
+    "paths": {
+        "/api/samples": {
+            "get": {
+                "tags": [
+                    "Samples"
+                ],
+                "summary": "List samples",
+                "description": "Returns all Sample entities",
+                "operationId": "listSamples",
+                "responses": {
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "List of samples",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/SampleDTO"
+                                    }
+                                },
+                                "examples": {
+                                    "ListResponse": {
+                                        "description": "ListResponse",
+                                        "value": [
+                                            {
+                                                "text": "A",
+                                                "number": 1,
+                                                "status": "active"
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Samples"
+                ],
+                "summary": "Create a sample",
+                "description": "Creates a new Sample entity",
+                "operationId": "createSample",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SampleDTO"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "Sample created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SampleDTO"
+                                },
+                                "examples": {
+                                    "SampleResponse": {
+                                        "description": "SampleResponse",
+                                        "value": {
+                                            "text": "Hello World",
+                                            "number": 42,
+                                            "status": "active",
+                                            "extras": {
+                                                "foo": "1"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "examples": {
+                                    "ValidationError": {
+                                        "description": "ValidationError",
+                                        "value": {
+                                            "message": "Validation failed",
+                                            "status": 400,
+                                            "timestamp": "2025-12-13T15:00:00Z",
+                                            "fieldErrors": [
+                                                {
+                                                    "field": "text",
+                                                    "message": "size must be between 3 and 100"
+                                                },
+                                                {
+                                                    "field": "number",
+                                                    "message": "must be less than or equal to 1000"
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "ErrorResponse": {
+                "type": "object",
+                "description": "Standard error response with validation details",
+                "properties": {
+                    "message": {
+                        "type": "string",
+                        "description": "Error message",
+                        "example": "Validation failed"
+                    },
+                    "status": {
+                        "type": "integer",
+                        "format": "int32",
+                        "description": "HTTP status code",
+                        "example": 400
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "description": "Timestamp when error occurred (ISO-8601)"
+                    },
+                    "fieldErrors": {
+                        "type": "array",
+                        "description": "List of field-level validation errors",
+                        "items": {
+                            "$ref": "#/components/schemas/FieldError"
+                        }
+                    }
+                }
+            },
+            "FieldError": {
+                "type": "object",
+                "description": "Individual field validation error",
+                "properties": {
+                    "field": {
+                        "type": "string",
+                        "description": "Field name",
+                        "example": "text"
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "Validation error message",
+                        "example": "size must be between 3 and 100"
+                    }
+                }
+            },
+            "SampleDTO": {
+                "type": "object",
+                "properties": {
+                    "text": {
+                        "type": "string",
+                        "description": "Text value",
+                        "example": "Hello World",
+                        "maxLength": 100,
+                        "minLength": 3
+                    },
+                    "number": {
+                        "type": "integer",
+                        "format": "int32",
+                        "description": "Number value",
+                        "example": 42,
+                        "maximum": 1000,
+                        "minimum": 0
+                    },
+                    "status": {
+                        "type": "string",
+                        "description": "Status enum",
+                        "enum": [
+                            "active",
+                            "inactive"
+                        ],
+                        "example": "active"
+                    },
+                    "extras": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "string"
+                        },
+                        "description": "Extra key-value pairs",
+                        "example": {
+                            "foo": "1"
+                        }
+                    }
+                },
+                "required": [
+                    "number",
+                    "status",
+                    "text"
+                ]
+            }
+        }
+    }
+}
