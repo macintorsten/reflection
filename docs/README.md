@@ -1,29 +1,26 @@
 # API Documentation
 
-This directory contains static API documentation generated from the OpenAPI specification.
+This directory contains static API documentation for the Reflection API.
 
 ## Files
 
 - `index.html` - Swagger UI interface for browsing the API documentation
-- `openapi.json` - OpenAPI 3.1.0 specification for the Reflection API
+- `openapi.json` - Generated during deployment (not checked into version control)
+
+## How It Works
+
+The OpenAPI specification is automatically generated during the GitHub Pages deployment:
+
+1. The GitHub Actions workflow builds the application
+2. Starts the application temporarily with Docker Compose
+3. Fetches the OpenAPI spec from the running application at `/v3/api-docs`
+4. Deploys the static files to GitHub Pages
+
+This ensures the documentation always reflects the current state of the API without manual intervention.
 
 ## Viewing Locally
 
-You can open `index.html` directly in a browser, or serve it with a simple HTTP server:
-
-```bash
-# Using Python
-python3 -m http.server 8000 --directory docs
-
-# Using Node.js (if npx is available)
-npx serve docs
-```
-
-Then visit http://localhost:8000
-
-## Updating the Specification
-
-The OpenAPI specification is generated from the application's annotations. To update it:
+To preview the documentation locally:
 
 1. Start the application:
    ```bash
@@ -31,26 +28,23 @@ The OpenAPI specification is generated from the application's annotations. To up
    mvn spring-boot:run
    ```
 
-2. Generate the spec (in a separate terminal):
+2. In a separate terminal, generate the spec and serve the docs:
    ```bash
    curl http://localhost:8080/v3/api-docs -o docs/openapi.json
+   python3 -m http.server 8000 --directory docs
    ```
 
-3. Format the JSON (optional):
-   ```bash
-   python3 -m json.tool docs/openapi.json > docs/openapi-formatted.json
-   mv docs/openapi-formatted.json docs/openapi.json
-   ```
-
-4. Commit the changes:
-   ```bash
-   git add docs/openapi.json
-   git commit -m "Update OpenAPI specification"
-   ```
+3. Visit http://localhost:8000
 
 ## GitHub Pages
 
-This documentation is published to GitHub Pages and can be accessed at:
+The documentation is automatically published to GitHub Pages when changes are pushed to the `main` branch:
 https://macintorsten.github.io/reflection/
+
+The deployment is triggered by changes to:
+- Source code (`src/**`)
+- Maven configuration (`pom.xml`)
+- Documentation files (`docs/**`)
+- Deployment workflow (`.github/workflows/deploy-docs.yml`)
 
 Note: The "Try it out" functionality is disabled in the static version since there's no running server.

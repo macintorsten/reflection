@@ -53,3 +53,6 @@ logs/
 
 # Others
 *.swp
+
+# Generated documentation
+docs/openapi.json

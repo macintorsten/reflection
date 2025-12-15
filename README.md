@@ -43,7 +43,10 @@ The application will be available at http://localhost:8080
 
 Static API documentation is available at: **https://macintorsten.github.io/reflection/**
 
-The documentation is automatically generated from OpenAPI annotations in the code and published to GitHub Pages. Note that the "Try it out" functionality is disabled in the static version since there's no running server backend.
+The documentation is automatically generated and deployed:
+- OpenAPI spec is extracted from the running application during GitHub Pages deployment
+- No manual updates needed - documentation stays in sync with code changes
+- "Try it out" functionality is disabled since there's no running server backend
 
 ## Testing
 
