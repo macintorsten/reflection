@@ -141,7 +141,8 @@
                     <apiDocsUrl>http://localhost:8080/v3/api-docs</apiDocsUrl>
                     <outputFileName>openapi-spec.json</outputFileName>
                     <outputDir>${project.basedir}/src/test/resources</outputDir>
-                    <skip>false</skip>
+                    <!-- Skip by default, enable with -Dspring.openapi.generate=true -->
+                    <skip>true</skip>
                 </configuration>
             </plugin>
             <plugin>
@@ -153,12 +154,20 @@
                         <goals>
                             <goal>start</goal>
                         </goals>
+                        <configuration>
+                            <!-- Skip by default, only needed for OpenAPI spec generation -->
+                            <skip>true</skip>
+                        </configuration>
                     </execution>
                     <execution>
                         <id>post-integration-test</id>
                         <goals>
                             <goal>stop</goal>
                         </goals>
+                        <configuration>
+                            <!-- Skip by default, only needed for OpenAPI spec generation -->
+                            <skip>true</skip>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
