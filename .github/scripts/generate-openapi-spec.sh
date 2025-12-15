@@ -29,9 +29,6 @@ echo "Step 3: Starting application..."
 java -jar target/*.jar &
 APP_PID=$!
 echo "Application started with PID: ${APP_PID}"
-
-# Save PID to file for cleanup
-echo $APP_PID > /tmp/app.pid
 echo ""
 
 # 4. Wait for application to be ready
@@ -66,7 +63,6 @@ echo "Stopping application (PID: ${APP_PID})..."
 kill $APP_PID 2>/dev/null || true
 echo "Stopping database..."
 docker compose down
-rm -f /tmp/app.pid
 echo "✓ Cleanup complete"
 echo ""
 
