@@ -39,42 +39,8 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
       
-      - name: Build application
-        run: mvn clean package -DskipTests
-      
-      - name: Start database
-        run: docker compose up -d
-      
-      - name: Start application
-        run: |
-          java -jar target/*.jar &
-          echo $! > app.pid
-          
-          # Wait for application to start (max 60 seconds)
-          echo "Waiting for application to start..."
-          for i in {1..60}; do
-            if curl -s http://localhost:8080/v3/api-docs > /dev/null 2>&1; then
-              echo "Application is ready!"
-              break
-            fi
-            if [ $i -eq 60 ]; then
-              echo "Application failed to start"
-              exit 1
-            fi
-            sleep 1
-          done
-      
       - name: Generate OpenAPI specification
-        run: |
-          curl -f http://localhost:8080/v3/api-docs | python3 -m json.tool > docs/openapi.json
-      
-      - name: Stop application
-        if: always()
-        run: |
-          if [ -f app.pid ]; then
-            kill $(cat app.pid) || true
-          fi
-          docker compose down || true
+        run: .github/scripts/generate-openapi-spec.sh docs
       
       - name: Setup Pages
         uses: actions/configure-pages@v4

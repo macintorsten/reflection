@@ -18,23 +18,44 @@ The OpenAPI specification is automatically generated during the GitHub Pages dep
 
 This ensures the documentation always reflects the current state of the API without manual intervention.
 
-## Viewing Locally
+## Generating and Testing Locally
 
-To preview the documentation locally:
+Use the provided scripts to generate and test the documentation:
 
-1. Start the application:
-   ```bash
-   docker compose up -d
-   mvn spring-boot:run
-   ```
+### Generate OpenAPI Spec
+```bash
+# Generate the OpenAPI specification
+.github/scripts/generate-openapi-spec.sh docs
+```
 
-2. In a separate terminal, generate the spec and serve the docs:
-   ```bash
-   curl http://localhost:8080/v3/api-docs -o docs/openapi.json
-   python3 -m http.server 8000 --directory docs
-   ```
+This script will:
+- Build the application
+- Start the database and application
+- Generate the OpenAPI spec
+- Clean up resources
 
-3. Visit http://localhost:8000
+### Test Documentation
+```bash
+# Verify the documentation setup
+.github/scripts/test-docs-locally.sh
+```
+
+This script validates:
+- Required files exist
+- OpenAPI spec is valid JSON
+- HTML is correctly configured
+
+### View Locally
+After generating the spec, serve the documentation:
+```bash
+# Using Python
+python3 -m http.server 8000 --directory docs
+
+# Or using npx
+npx serve docs
+```
+
+Then visit http://localhost:8000
 
 ## GitHub Pages
 
