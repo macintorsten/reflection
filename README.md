@@ -3,7 +3,7 @@
 [![CI](https://github.com/macintorsten/reflection/workflows/CI/badge.svg)](https://github.com/macintorsten/reflection/actions/workflows/ci.yml)
 
 A Java Spring Boot REST API project with PostgreSQL backend, demonstrating:
-- Spring Boot 3.5.8 with Java 21
+- Spring Boot with Java 21
 - JPA/Hibernate with PostgreSQL
 - Testcontainers for integration testing
 - OpenAPI/Swagger documentation
@@ -12,9 +12,9 @@ A Java Spring Boot REST API project with PostgreSQL backend, demonstrating:
 ## Building and Testing
 
 ### Prerequisites
-- Java 21 (Temurin distribution)
+- Java 21
 - Maven 3.x
-- Docker (for running the application and tests)
+- Docker
 
 ### Quick Start
 
