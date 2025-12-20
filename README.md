@@ -71,9 +71,8 @@ See [.github/workflows/ci.yml](.github/workflows/ci.yml) for details.
 This repository includes comprehensive instructions for GitHub Copilot to provide better assistance with:
 - Building and testing the application
 - Understanding project architecture
-- Managing Maven dependencies
 - Following coding standards
 
-The instructions are located in `.github/copilot-instructions.md` and `.github/instructions/`. Custom agents are available for specialized tasks like dependency management.
+The instructions are located in `.github/copilot-instructions.md` and `.github/instructions/`.
 
 For more details, see [.github/copilot-instructions.md](.github/copilot-instructions.md).

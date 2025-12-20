@@ -8,32 +8,10 @@ applyTo: ".github/**/*.md"
 | Type | Pattern | Purpose |
 |---|---|---|
 | **Custom Instructions** | `.github/copilot-instructions.md` | Repo-wide context, standards, build/test commands. |
-| **Custom Agents** | `.github/agents/*.agent.md` | Specialized tasks, orchestration, domain expertise. |
 | **Instructions** | `.github/instructions/*.instructions.md` | Reusable guidance, templates, checklists. |
 | **Prompts** | `.github/prompts/*.prompt.md` | Task-specific prompts (slash commands). |
 
 ## Structure & Templates
-
-### Custom Agent (`.agent.md`)
-```yaml
----
-name: Agent Name
-description: Concise role description
-tools: ['runCommands', 'edit', 'search', 'fetch', 'runSubagent']
----
-```
-```markdown
-# Agent Name
-You are an expert in [domain]. Your role is to [purpose].
-
-## Process
-1. [Step 1]
-2. [Step 2]
-
-## Boundaries
-- [Constraint 1]
-- [Constraint 2]
-```
 
 ### Instruction File (`.instructions.md`)
 ```yaml
@@ -54,16 +32,6 @@ applyTo: "**/*.{ts,tsx}" # Glob pattern
 - **Research:** `['search', 'fetch', 'openSimpleBrowser']`
 - **Editing:** `['read', 'edit', 'search']`
 - **Build/Test:** `['runCommands', 'read']`
-- **Orchestration:** `['runCommands', 'edit', 'search', 'runSubagent']`
-
-## Subagent Delegation
-Use `#tool:runSubagent` with a detailed prompt:
-```markdown
-Research [topic] for:
-{context}
-
-Return findings in [format] with verified links.
-```
 
 ## Incremental Updates
 For multi-step workflows, create an initial report and update it incrementally after each step.
