@@ -66,6 +66,7 @@ grep -A 10 "services:" docker-compose.yml
 |------|------|
 | **Build, Test, Run** | `.github/instructions/build-and-test.instructions.md` |
 | **Code Structure** | `.github/instructions/architecture.instructions.md` |
+| **API Versioning & Specs** | `.github/instructions/api-versioning.instructions.md` |
 | **Dep Research** | `.github/skills/maven-dependency-research/SKILL.md` |
 | **TDD Workflow** | `.github/skills/tdd/SKILL.md` |
 | **Authoring** | `.github/instructions/copilot-authoring.instructions.md` |

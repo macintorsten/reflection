@@ -83,8 +83,23 @@ public class OpenApiValidator {
             if (responseNode.isMissingNode()) {
                 throw new RuntimeException("Response " + statusCode + " not found in OpenAPI spec for: " + method + " " + path);
             }
-            
-            JsonNode schemaNode = responseNode.path("content").path("application/json").path("schema");
+
+            JsonNode contentNode = responseNode.path("content");
+            JsonNode schemaNode = contentNode.path("application/json").path("schema");
+
+            // Springdoc sometimes emits '*/*' when no produces/consumes media type is declared.
+            if (schemaNode.isMissingNode()) {
+                schemaNode = contentNode.path("*/*").path("schema");
+            }
+
+            // As a last resort, pick the first available content type.
+            if (schemaNode.isMissingNode() && contentNode.isObject()) {
+                var fields = contentNode.fields();
+                if (fields.hasNext()) {
+                    schemaNode = fields.next().getValue().path("schema");
+                }
+            }
+
             if (schemaNode.isMissingNode()) {
                 throw new RuntimeException("Schema not found for response " + statusCode + " in: " + method + " " + path);
             }
@@ -171,6 +186,32 @@ public class OpenApiValidator {
                         typeArray.add("array");
                         typeArray.add("null");
                         fieldErrorsProp.set("type", typeArray);
+                    }
+                }
+
+                // SampleResponse: extras is optional and often serialized as null.
+                if (props.has("extras")) {
+                    com.fasterxml.jackson.databind.node.ObjectNode extrasProp =
+                        (com.fasterxml.jackson.databind.node.ObjectNode) props.get("extras");
+
+                    if (extrasProp.has("type") && extrasProp.get("type").isTextual()
+                        && extrasProp.get("type").asText().equals("object")) {
+                        com.fasterxml.jackson.databind.node.ArrayNode typeArray = objectMapper.createArrayNode();
+                        typeArray.add("object");
+                        typeArray.add("null");
+                        extrasProp.set("type", typeArray);
+                    }
+                }
+
+                // SampleResponse timestamps are LocalDateTime (no timezone), but OpenAPI often marks them as date-time.
+                // The RestAssured JSON schema validator is strict about RFC3339 offsets; drop the format to avoid false negatives.
+                for (String timeField : new String[] { "createdAt", "updatedAt" }) {
+                    if (props.has(timeField)) {
+                        com.fasterxml.jackson.databind.node.ObjectNode timeProp =
+                            (com.fasterxml.jackson.databind.node.ObjectNode) props.get(timeField);
+                        if (timeProp.has("format") && timeProp.get("format").asText().equals("date-time")) {
+                            timeProp.remove("format");
+                        }
                     }
                 }
             }

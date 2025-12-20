@@ -6,7 +6,7 @@ on:
     paths:
       - 'src/**'
       - 'pom.xml'
-      - 'docs/**'
+      - '.github/api-specs/**'
       - '.github/workflows/deploy-docs.yml'
   workflow_dispatch:
 
@@ -32,15 +32,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       
-      - name: Set up JDK 21
-        uses: actions/setup-java@v4
-        with:
-          java-version: '21'
-          distribution: 'temurin'
-          cache: 'maven'
-      
-      - name: Generate OpenAPI specification
-        run: .github/scripts/generate-openapi-spec.sh docs
+      - name: Copy baseline OpenAPI spec to docs
+        run: |
+          cp .github/api-specs/v1/openapi.json docs/openapi.json
       
       - name: Setup Pages
         uses: actions/configure-pages@v4

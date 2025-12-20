@@ -77,5 +77,8 @@ public abstract class AbstractIntegrationTest {
         registry.add("spring.datasource.url", postgres::getJdbcUrl);
         registry.add("spring.datasource.username", postgres::getUsername);
         registry.add("spring.datasource.password", postgres::getPassword);
+
+        // Ensure Hibernate creates schema in the ephemeral Testcontainers database.
+        registry.add("spring.jpa.hibernate.ddl-auto", () -> "create-drop");
     }
 }

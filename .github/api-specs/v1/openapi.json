@@ -1,0 +1,330 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "Reflection API",
+        "description": "CRUD operations for Sample entities with versioned endpoints",
+        "license": {
+            "name": "Unspecified",
+            "url": "https://example.com"
+        },
+        "version": "v1"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8080",
+            "description": "Generated server url"
+        }
+    ],
+    "tags": [
+        {
+            "name": "Samples V1",
+            "description": "Version 1 of Sample operations"
+        }
+    ],
+    "paths": {
+        "/api/v1/samples": {
+            "get": {
+                "tags": [
+                    "Samples V1"
+                ],
+                "summary": "List samples",
+                "description": "Returns all Sample entities",
+                "operationId": "listSamples",
+                "responses": {
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/SampleResponse"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Samples V1"
+                ],
+                "summary": "Create a sample",
+                "description": "Creates a new Sample entity",
+                "operationId": "createSample",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateSampleRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "400": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "Sample created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SampleResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/samples/{id}": {
+            "get": {
+                "tags": [
+                    "Samples V1"
+                ],
+                "summary": "Get sample by ID",
+                "description": "Returns a sample by its ID",
+                "operationId": "getSample",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "Sample found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SampleResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Sample not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "ErrorResponse": {
+                "type": "object",
+                "description": "Error response",
+                "properties": {
+                    "message": {
+                        "type": "string",
+                        "description": "Error message",
+                        "example": "Validation failed"
+                    },
+                    "status": {
+                        "type": "integer",
+                        "format": "int32",
+                        "description": "HTTP status code",
+                        "example": 400
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "description": "Timestamp of the error",
+                        "example": "2025-12-20T15:00:00Z"
+                    },
+                    "fieldErrors": {
+                        "type": "array",
+                        "description": "Field-level validation errors",
+                        "items": {
+                            "$ref": "#/components/schemas/FieldError"
+                        }
+                    }
+                }
+            },
+            "FieldError": {
+                "type": "object",
+                "description": "Field validation error",
+                "properties": {
+                    "field": {
+                        "type": "string",
+                        "description": "Field name",
+                        "example": "text"
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "Error message",
+                        "example": "size must be between 3 and 100"
+                    }
+                }
+            },
+            "CreateSampleRequest": {
+                "type": "object",
+                "description": "Request to create a new sample",
+                "properties": {
+                    "text": {
+                        "type": "string",
+                        "description": "Text value",
+                        "example": "Hello World",
+                        "maxLength": 100,
+                        "minLength": 3
+                    },
+                    "number": {
+                        "type": "integer",
+                        "format": "int32",
+                        "description": "Number value",
+                        "example": 42,
+                        "maximum": 1000,
+                        "minimum": 0
+                    },
+                    "status": {
+                        "type": "string",
+                        "description": "Status enum",
+                        "enum": [
+                            "active",
+                            "inactive"
+                        ],
+                        "example": "active"
+                    },
+                    "extras": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "string"
+                        },
+                        "description": "Extra key-value pairs",
+                        "example": {
+                            "foo": "1"
+                        }
+                    }
+                },
+                "required": [
+                    "number",
+                    "status",
+                    "text"
+                ]
+            },
+            "SampleResponse": {
+                "type": "object",
+                "description": "Sample response",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "description": "Sample ID",
+                        "example": 1
+                    },
+                    "text": {
+                        "type": "string",
+                        "description": "Text value",
+                        "example": "Hello World"
+                    },
+                    "number": {
+                        "type": "integer",
+                        "format": "int32",
+                        "description": "Number value",
+                        "example": 42
+                    },
+                    "status": {
+                        "type": "string",
+                        "description": "Status",
+                        "enum": [
+                            "active",
+                            "inactive"
+                        ],
+                        "example": "active"
+                    },
+                    "extras": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "string"
+                        },
+                        "description": "Extra key-value pairs",
+                        "example": {
+                            "foo": "1"
+                        }
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Creation timestamp"
+                    },
+                    "updatedAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Last update timestamp"
+                    }
+                }
+            }
+        }
+    }
+}

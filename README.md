@@ -34,8 +34,9 @@ mvn spring-boot:run
 The application will be available at http://localhost:8080
 
 ### API Endpoints
-- `POST /api/samples` - Create a new sample
-- `GET /api/samples` - List all samples
+- `POST /api/v1/samples` - Create a new sample
+- `GET /api/v1/samples` - List all samples
+- `GET /api/v1/samples/{id}` - Get a specific sample
 - `GET /swagger-ui.html` - Interactive Swagger UI (when app is running)
 - `GET /v3/api-docs` - OpenAPI specification (when app is running)
 
