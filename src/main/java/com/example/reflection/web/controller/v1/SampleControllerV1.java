@@ -4,14 +4,14 @@ import com.example.reflection.domain.model.Sample;
 import com.example.reflection.service.SampleService;
 import com.example.reflection.web.dto.v1.request.CreateSampleRequest;
 import com.example.reflection.web.dto.v1.response.SampleResponse;
-import com.example.reflection.web.exception.ErrorResponse;
 import com.example.reflection.web.mapper.SampleMapperV1;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,8 +27,9 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/v1/samples")
 @Tag(name = "Samples V1", description = "Version 1 of Sample operations")
-@Slf4j
 public class SampleControllerV1 {
+    
+    private static final Logger log = LoggerFactory.getLogger(SampleControllerV1.class);
     
     private final SampleService sampleService;
     private final SampleMapperV1 mapper;

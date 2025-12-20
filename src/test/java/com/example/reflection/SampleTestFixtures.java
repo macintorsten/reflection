@@ -21,11 +21,7 @@ public class SampleTestFixtures {
      * Creates a basic CreateSampleRequest with required fields.
      */
     public static CreateSampleRequest createBasicRequest(String text, int number, Status status) {
-        CreateSampleRequest request = new CreateSampleRequest();
-        request.setText(text);
-        request.setNumber(number);
-        request.setStatus(status);
-        return request;
+        return new CreateSampleRequest(text, number, status, null);
     }
 
     /**
@@ -33,9 +29,7 @@ public class SampleTestFixtures {
      */
     public static CreateSampleRequest createRequestWithExtras(
             String text, int number, Status status, Map<String, String> extras) {
-        CreateSampleRequest request = createBasicRequest(text, number, status);
-        request.setExtras(extras);
-        return request;
+        return new CreateSampleRequest(text, number, status, extras);
     }
 
     /**
@@ -90,14 +84,15 @@ public class SampleTestFixtures {
      * Creates a basic SampleResponse.
      */
     public static SampleResponse createBasicResponse(Long id, String text, int number, Status status) {
-        return SampleResponse.builder()
-                .id(id)
-                .text(text)
-                .number(number)
-                .status(status)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .build();
+        return new SampleResponse(
+                id,
+                text,
+                number,
+                status,
+                null,
+                LocalDateTime.now(),
+                LocalDateTime.now()
+        );
     }
 
     /**
@@ -105,14 +100,14 @@ public class SampleTestFixtures {
      */
     public static SampleResponse createResponseWithExtras(
             Long id, String text, int number, Status status, Map<String, String> extras) {
-        return SampleResponse.builder()
-                .id(id)
-                .text(text)
-                .number(number)
-                .status(status)
-                .extras(extras)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .build();
+        return new SampleResponse(
+                id,
+                text,
+                number,
+                status,
+                extras,
+                LocalDateTime.now(),
+                LocalDateTime.now()
+        );
     }
 }

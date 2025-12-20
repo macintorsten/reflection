@@ -25,10 +25,7 @@ class SampleMapperV1Test {
     @Test
     void toDomain_fromRequest_mapsBasicFields() {
         // Arrange
-        CreateSampleRequest request = new CreateSampleRequest();
-        request.setText("Test");
-        request.setNumber(42);
-        request.setStatus(Status.ACTIVE);
+        CreateSampleRequest request = new CreateSampleRequest("Test", 42, Status.ACTIVE, null);
 
         // Act
         Sample domain = mapper.toDomain(request);
@@ -42,11 +39,9 @@ class SampleMapperV1Test {
     @Test
     void toDomain_fromRequest_convertsExtrasToMapField() {
         // Arrange - extras has String values, mapField needs Integer
-        CreateSampleRequest request = new CreateSampleRequest();
-        request.setText("Test");
-        request.setNumber(1);
-        request.setStatus(Status.ACTIVE);
-        request.setExtras(Map.of("priority", "5", "count", "100"));
+        CreateSampleRequest request = new CreateSampleRequest(
+            "Test", 1, Status.ACTIVE, Map.of("priority", "5", "count", "100")
+        );
 
         // Act
         Sample domain = mapper.toDomain(request);
@@ -60,11 +55,9 @@ class SampleMapperV1Test {
     @Test
     void toDomain_fromRequest_invalidNumberInExtras_defaultsToZero() {
         // Arrange - "not-a-number" cannot be parsed as Integer
-        CreateSampleRequest request = new CreateSampleRequest();
-        request.setText("Test");
-        request.setNumber(1);
-        request.setStatus(Status.INACTIVE);
-        request.setExtras(Map.of("invalid", "not-a-number", "valid", "42"));
+        CreateSampleRequest request = new CreateSampleRequest(
+            "Test", 1, Status.INACTIVE, Map.of("invalid", "not-a-number", "valid", "42")
+        );
 
         // Act
         Sample domain = mapper.toDomain(request);
@@ -77,11 +70,7 @@ class SampleMapperV1Test {
     @Test
     void toDomain_fromRequest_nullExtras_mapFieldIsNull() {
         // Arrange
-        CreateSampleRequest request = new CreateSampleRequest();
-        request.setText("Test");
-        request.setNumber(1);
-        request.setStatus(Status.ACTIVE);
-        request.setExtras(null);
+        CreateSampleRequest request = new CreateSampleRequest("Test", 1, Status.ACTIVE, null);
 
         // Act
         Sample domain = mapper.toDomain(request);
@@ -93,11 +82,7 @@ class SampleMapperV1Test {
     @Test
     void toDomain_fromRequest_emptyExtras_mapFieldIsNull() {
         // Arrange
-        CreateSampleRequest request = new CreateSampleRequest();
-        request.setText("Test");
-        request.setNumber(1);
-        request.setStatus(Status.ACTIVE);
-        request.setExtras(Map.of());
+        CreateSampleRequest request = new CreateSampleRequest("Test", 1, Status.ACTIVE, Map.of());
 
         // Act
         Sample domain = mapper.toDomain(request);
@@ -182,12 +167,12 @@ class SampleMapperV1Test {
         SampleResponse response = mapper.toResponse(domain);
 
         // Assert
-        assertThat(response.getId()).isEqualTo(1L);
-        assertThat(response.getText()).isEqualTo("Test");
-        assertThat(response.getNumber()).isEqualTo(42);
-        assertThat(response.getStatus()).isEqualTo(Status.INACTIVE);
-        assertThat(response.getCreatedAt()).isEqualTo(now);
-        assertThat(response.getUpdatedAt()).isEqualTo(now);
+        assertThat(response.id()).isEqualTo(1L);
+        assertThat(response.text()).isEqualTo("Test");
+        assertThat(response.number()).isEqualTo(42);
+        assertThat(response.status()).isEqualTo(Status.INACTIVE);
+        assertThat(response.createdAt()).isEqualTo(now);
+        assertThat(response.updatedAt()).isEqualTo(now);
     }
 
     @Test
@@ -205,9 +190,9 @@ class SampleMapperV1Test {
         SampleResponse response = mapper.toResponse(domain);
 
         // Assert - values are converted to Strings
-        assertThat(response.getExtras()).isNotNull();
-        assertThat(response.getExtras().get("priority")).isEqualTo("5");
-        assertThat(response.getExtras().get("count")).isEqualTo("100");
+        assertThat(response.extras()).isNotNull();
+        assertThat(response.extras().get("priority")).isEqualTo("5");
+        assertThat(response.extras().get("count")).isEqualTo("100");
     }
 
     @Test
@@ -225,7 +210,7 @@ class SampleMapperV1Test {
         SampleResponse response = mapper.toResponse(domain);
 
         // Assert
-        assertThat(response.getExtras()).isNull();
+        assertThat(response.extras()).isNull();
     }
 
     @Test
@@ -243,7 +228,7 @@ class SampleMapperV1Test {
         SampleResponse response = mapper.toResponse(domain);
 
         // Assert
-        assertThat(response.getExtras()).isNull();
+        assertThat(response.extras()).isNull();
     }
 
     // ========== Round-trip Tests ==========
@@ -251,11 +236,9 @@ class SampleMapperV1Test {
     @Test
     void fullRoundTrip_preservesData() {
         // Arrange - Request DTO
-        CreateSampleRequest request = new CreateSampleRequest();
-        request.setText("Round Trip Test");
-        request.setNumber(999);
-        request.setStatus(Status.ACTIVE);
-        request.setExtras(Map.of("key1", "10", "key2", "20"));
+        CreateSampleRequest request = new CreateSampleRequest(
+            "Round Trip Test", 999, Status.ACTIVE, Map.of("key1", "10", "key2", "20")
+        );
 
         // Act - Request → Domain → Entity → Domain → Response
         Sample domainFromRequest = mapper.toDomain(request);
@@ -264,10 +247,10 @@ class SampleMapperV1Test {
         SampleResponse response = mapper.toResponse(domainFromEntity);
 
         // Assert - data is preserved
-        assertThat(response.getText()).isEqualTo(request.getText());
-        assertThat(response.getNumber()).isEqualTo(request.getNumber());
-        assertThat(response.getStatus()).isEqualTo(request.getStatus());
-        assertThat(response.getExtras()).isEqualTo(request.getExtras());
+        assertThat(response.text()).isEqualTo(request.text());
+        assertThat(response.number()).isEqualTo(request.number());
+        assertThat(response.status()).isEqualTo(request.status());
+        assertThat(response.extras()).isEqualTo(request.extras());
     }
 
     @Test
@@ -285,18 +268,16 @@ class SampleMapperV1Test {
         SampleResponse response = mapper.toResponse(domain);
 
         // Assert
-        assertThat(response.getNumber()).isEqualTo(0);
-        assertThat(response.getExtras().get("zero")).isEqualTo("0");
+        assertThat(response.number()).isEqualTo(0);
+        assertThat(response.extras().get("zero")).isEqualTo("0");
     }
 
     @Test
     void toDomain_fromRequest_handlesNegativeNumbers() {
         // Arrange
-        CreateSampleRequest request = new CreateSampleRequest();
-        request.setText("Negative Test");
-        request.setNumber(-5);
-        request.setStatus(Status.INACTIVE);
-        request.setExtras(Map.of("negative", "-10"));
+        CreateSampleRequest request = new CreateSampleRequest(
+            "Negative Test", -5, Status.INACTIVE, Map.of("negative", "-10")
+        );
 
         // Act
         Sample domain = mapper.toDomain(request);

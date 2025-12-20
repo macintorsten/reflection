@@ -26,8 +26,8 @@ public class SampleMapperV1 {
     public Sample toDomain(CreateSampleRequest request) {
         // Convert extras Map<String, String> to Map<String, Integer> if present
         Map<String, Integer> mapField = null;
-        if (request.getExtras() != null && !request.getExtras().isEmpty()) {
-            mapField = request.getExtras().entrySet().stream()
+        if (request.extras() != null && !request.extras().isEmpty()) {
+            mapField = request.extras().entrySet().stream()
                 .collect(Collectors.toMap(
                     Map.Entry::getKey,
                     e -> {
@@ -41,9 +41,9 @@ public class SampleMapperV1 {
         }
         
         return Sample.builder()
-            .text(request.getText())
-            .number(request.getNumber())
-            .status(request.getStatus())
+            .text(request.text())
+            .number(request.number())
+            .status(request.status())
             .mapField(mapField)
             .build();
     }
@@ -93,14 +93,14 @@ public class SampleMapperV1 {
                 ));
         }
         
-        return SampleResponse.builder()
-            .id(domain.getId())
-            .text(domain.getText())
-            .number(domain.getNumber())
-            .status(domain.getStatus())
-            .extras(extras)
-            .createdAt(domain.getCreatedAt())
-            .updatedAt(domain.getUpdatedAt())
-            .build();
+        return new SampleResponse(
+            domain.getId(),
+            domain.getText(),
+            domain.getNumber(),
+            domain.getStatus(),
+            extras,
+            domain.getCreatedAt(),
+            domain.getUpdatedAt()
+        );
     }
 }

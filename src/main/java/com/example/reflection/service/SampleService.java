@@ -5,7 +5,8 @@ import com.example.reflection.domain.model.Sample;
 import com.example.reflection.persistence.entity.SampleEntity;
 import com.example.reflection.persistence.repository.SampleRepository;
 import com.example.reflection.web.mapper.SampleMapperV1;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,8 +20,9 @@ import java.util.stream.Collectors;
  */
 @Service
 @Transactional
-@Slf4j
 public class SampleService {
+    
+    private static final Logger log = LoggerFactory.getLogger(SampleService.class);
     
     private final SampleRepository repository;
     private final SampleMapperV1 mapper;

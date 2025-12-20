@@ -2,9 +2,6 @@ package com.example.reflection.persistence.entity;
 
 import com.example.reflection.domain.model.Status;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -16,9 +13,6 @@ import java.util.Map;
  */
 @Entity
 @Table(name = "samples")
-@Getter
-@Setter
-@NoArgsConstructor
 public class SampleEntity {
     
     @Id
@@ -49,6 +43,65 @@ public class SampleEntity {
     
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+    
+    public SampleEntity() {
+    }
+    
+    public Long getId() {
+        return id;
+    }
+    
+    public void setId(Long id) {
+        this.id = id;
+    }
+    
+    public String getText() {
+        return text;
+    }
+    
+    public void setText(String text) {
+        this.text = text;
+    }
+    
+    public Integer getNumber() {
+        return number;
+    }
+    
+    public void setNumber(Integer number) {
+        this.number = number;
+    }
+    
+    public Status getStatus() {
+        return status;
+    }
+    
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+    
+    public Map<String, Integer> getMapField() {
+        return mapField;
+    }
+    
+    public void setMapField(Map<String, Integer> mapField) {
+        this.mapField = mapField;
+    }
+    
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+    
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+    
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+    
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
     
     @PrePersist
     protected void onCreate() {
