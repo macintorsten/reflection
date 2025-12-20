@@ -36,37 +36,44 @@ class SampleServiceTest {
 
     private SampleService service;
 
+    // Test data constants
+    private static final String TEST_TEXT = "Test Sample";
+    private static final int TEST_NUMBER = 42;
+    private static final Status TEST_STATUS = Status.ACTIVE;
+    private static final Long TEST_ID = 1L;
+
     @BeforeEach
     void setUp() {
         service = new SampleService(repository, mapper);
     }
 
+    // ========== Test Data Builders ==========
+
+    private Sample createTestDomain(Long id) {
+        return Sample.builder()
+            .id(id)
+            .text(TEST_TEXT)
+            .number(TEST_NUMBER)
+            .status(TEST_STATUS)
+            .build();
+    }
+
+    private SampleEntity createTestEntity(Long id) {
+        SampleEntity entity = new SampleEntity();
+        entity.setId(id);
+        entity.setText(TEST_TEXT);
+        entity.setNumber(TEST_NUMBER);
+        entity.setStatus(TEST_STATUS);
+        return entity;
+    }
+
     @Test
     void createSample_callsMapperAndRepository() {
         // Arrange
-        Sample inputDomain = Sample.builder()
-            .text("Test Sample")
-            .number(42)
-            .status(Status.ACTIVE)
-            .build();
-
-        SampleEntity mappedEntity = new SampleEntity();
-        mappedEntity.setText("Test Sample");
-        mappedEntity.setNumber(42);
-        mappedEntity.setStatus(Status.ACTIVE);
-
-        SampleEntity savedEntity = new SampleEntity();
-        savedEntity.setId(1L);
-        savedEntity.setText("Test Sample");
-        savedEntity.setNumber(42);
-        savedEntity.setStatus(Status.ACTIVE);
-
-        Sample outputDomain = Sample.builder()
-            .id(1L)
-            .text("Test Sample")
-            .number(42)
-            .status(Status.ACTIVE)
-            .build();
+        Sample inputDomain = createTestDomain(null);
+        SampleEntity mappedEntity = createTestEntity(null);
+        SampleEntity savedEntity = createTestEntity(TEST_ID);
+        Sample outputDomain = createTestDomain(TEST_ID);
 
         when(mapper.toEntity(inputDomain)).thenReturn(mappedEntity);
         when(repository.save(mappedEntity)).thenReturn(savedEntity);
@@ -77,10 +84,10 @@ class SampleServiceTest {
 
         // Assert
         assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(1L);
-        assertThat(result.getText()).isEqualTo("Test Sample");
-        assertThat(result.getNumber()).isEqualTo(42);
-        assertThat(result.getStatus()).isEqualTo(Status.ACTIVE);
+        assertThat(result.getId()).isEqualTo(TEST_ID);
+        assertThat(result.getText()).isEqualTo(TEST_TEXT);
+        assertThat(result.getNumber()).isEqualTo(TEST_NUMBER);
+        assertThat(result.getStatus()).isEqualTo(TEST_STATUS);
 
         verify(mapper).toEntity(inputDomain);
         verify(repository).save(mappedEntity);
@@ -236,32 +243,21 @@ class SampleServiceTest {
     @Test
     void getSampleById_found_returnsDomain() {
         // Arrange
-        Long id = 1L;
-        SampleEntity entity = new SampleEntity();
-        entity.setId(id);
-        entity.setText("Found Sample");
-        entity.setNumber(42);
-        entity.setStatus(Status.ACTIVE);
+        SampleEntity entity = createTestEntity(TEST_ID);
+        Sample domain = createTestDomain(TEST_ID);
 
-        Sample domain = Sample.builder()
-            .id(id)
-            .text("Found Sample")
-            .number(42)
-            .status(Status.ACTIVE)
-            .build();
-
-        when(repository.findById(id)).thenReturn(Optional.of(entity));
+        when(repository.findById(TEST_ID)).thenReturn(Optional.of(entity));
         when(mapper.toDomain(entity)).thenReturn(domain);
 
         // Act
-        Sample result = service.getSampleById(id);
+        Sample result = service.getSampleById(TEST_ID);
 
         // Assert
         assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(id);
-        assertThat(result.getText()).isEqualTo("Found Sample");
+        assertThat(result.getId()).isEqualTo(TEST_ID);
+        assertThat(result.getText()).isEqualTo(TEST_TEXT);
 
-        verify(repository).findById(id);
+        verify(repository).findById(TEST_ID);
         verify(mapper).toDomain(entity);
     }
 
