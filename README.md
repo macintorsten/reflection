@@ -33,13 +33,6 @@ mvn spring-boot:run
 
 The application will be available at http://localhost:8080
 
-### API Endpoints
-- `POST /api/v1/samples` - Create a new sample
-- `GET /api/v1/samples` - List all samples
-- `GET /api/v1/samples/{id}` - Get a specific sample
-- `GET /swagger-ui.html` - Interactive Swagger UI (when app is running)
-- `GET /v3/api-docs` - OpenAPI specification (when app is running)
-
 ### API Documentation
 
 [![Deploy API Documentation](https://github.com/macintorsten/reflection/actions/workflows/deploy-docs.yml/badge.svg)](https://github.com/macintorsten/reflection/actions/workflows/deploy-docs.yml)
@@ -50,15 +43,6 @@ The documentation is automatically generated and deployed:
 - OpenAPI spec is extracted from the running application during GitHub Pages deployment
 - No manual updates needed - documentation stays in sync with code changes
 - "Try it out" functionality is disabled since there's no running server backend
-
-## Testing
-
-Tests use Testcontainers to automatically manage PostgreSQL test databases. No manual database setup is required for testing.
-
-```bash
-# Run all tests
-mvn clean verify
-```
 
 ## CI/CD
 
