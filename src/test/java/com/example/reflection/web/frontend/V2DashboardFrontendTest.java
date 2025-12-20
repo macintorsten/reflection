@@ -145,15 +145,18 @@ class V2DashboardFrontendTest extends AbstractFrontendTest {
     // ========== Metadata Tests ==========
     
     @Test
-    @DisplayName("Should accept valid JSON metadata")
-    void shouldAcceptValidJsonMetadata() {
+    @DisplayName("Should display computed metadata for created sample")
+    void shouldDisplayComputedMetadataForCreatedSample() {
         // Given
         V2DashboardPage dashboardPage = createPage();
         dashboardPage.navigate();
-        String metadata = "{\"totalValue\": 100, \"itemCount\": 5, \"tags\": [\"test\", \"v2\"]}";
+        
+        // Note: Metadata is computed server-side from internal mapField structure.
+        // The metadata parameter is not used - it's here for API consistency but ignored.
+        // Backend computes: totalValue (sum), itemCount (count), tags (keys) from mapField.
         
         // When
-        dashboardPage.fillCreateForm("Metadata Test Sample", 75, 6, "active", metadata);
+        dashboardPage.fillCreateForm("Computed Metadata Sample", 75, 6, "active", null);
         dashboardPage.submitCreateForm();
         
         // Then
@@ -163,32 +166,15 @@ class V2DashboardFrontendTest extends AbstractFrontendTest {
         dashboardPage.clickRefresh();
         dashboardPage.waitForSamplesLoaded();
         String listText = dashboardPage.getSamplesListText();
-        assertThat(listText).contains("Metadata Test Sample");
-        // Metadata should be displayed with actual values (not just zeros)
-        if (dashboardPage.isMetadataVisible()) {
-            assertThat(listText)
-                .as("Metadata section should display values")
-                .containsAnyOf("Total Value:", "Item Count:", "Tags:");
-        }
-    }
-    
-    @Test
-    @DisplayName("Should show error when invalid JSON metadata provided")
-    @org.junit.jupiter.api.Disabled("V2 HTML form doesn't have metadata input field yet - backend supports it but frontend needs to be updated")
-    void shouldShowErrorWhenInvalidJsonMetadataProvided() {
-        // Given
-        V2DashboardPage dashboardPage = createPage();
-        dashboardPage.navigate();
-        String invalidMetadata = "{invalid json}";
+        assertThat(listText).contains("Computed Metadata Sample");
         
-        // When
-        dashboardPage.fillCreateForm("Invalid Metadata Test", 80, 5, "active", invalidMetadata);
-        dashboardPage.submitCreateForm();
-        
-        // Then
-        String error = dashboardPage.getCreateErrorMessage();
-        assertThat(error).isNotNull();
-        assertThat(error).containsIgnoringCase("json");
+        // Metadata is always displayed (computed from mapField, defaults to zeros for simple samples)
+        assertThat(dashboardPage.isMetadataVisible())
+            .as("Metadata section should be visible with computed values")
+            .isTrue();
+        assertThat(listText)
+            .as("Metadata section should display value labels")
+            .containsAnyOf("Total Value:", "Item Count:", "Tags:");
     }
     
     // ========== Statistics Tests ==========

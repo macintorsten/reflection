@@ -35,13 +35,19 @@ public class V2DashboardPage {
     
     /**
      * Fill the create form with sample data.
-     * Note: V2 API supports metadata in backend, but the HTML form doesn't have a metadata input field.
+     * 
+     * Note: Metadata is COMPUTED server-side, not user-provided.
+     * The metadata parameter exists for API consistency but is ignored.
+     * Backend computes metadata from internal mapField structure:
+     * - totalValue: sum of mapField values (excluding priority)
+     * - itemCount: count of mapField entries (excluding priority)  
+     * - tags: mapField keys (excluding priority)
      * 
      * @param text Sample text (3-100 chars)
      * @param number Sample number (0-1000)
      * @param priority Priority (1-10)
      * @param status Status ("active" or "inactive")
-     * @param metadata Optional JSON metadata (currently not used by HTML form)
+     * @param metadata Ignored - metadata is computed server-side (kept for method signature compatibility)
      */
     public void fillCreateForm(String text, int number, int priority, String status, String metadata) {
         page.locator("#text").fill(text);
@@ -49,8 +55,7 @@ public class V2DashboardPage {
         page.locator("#priority").fill(String.valueOf(priority));
         page.locator("#status").selectOption(status);
         
-        // Note: V2 HTML doesn't have a metadata input field, so we skip it
-        // The backend supports it, but the frontend form needs to be updated to include it
+        // Note: No metadata input field - metadata is computed by backend from mapField
     }
     
     /**

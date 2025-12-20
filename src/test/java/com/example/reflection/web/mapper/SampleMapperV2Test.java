@@ -189,4 +189,78 @@ class SampleMapperV2Test {
         assertEquals(0, metadata.itemCount());
         assertTrue(metadata.tags().isEmpty());
     }
+    
+    @Test
+    @DisplayName("Metadata creation - handles null mapField")
+    void testMetadataCreation_NullMapField() {
+        Sample domain = Sample.builder()
+            .id(1L)
+            .text("Test")
+            .number(100)
+            .status(Status.ACTIVE)
+            .mapField(null)
+            .build();
+
+        SampleResponse response = mapper.toResponse(domain);
+
+        AggregateMetadata metadata = response.metadata();
+        assertNotNull(metadata, "Metadata should never be null");
+        assertEquals(0, metadata.totalValue(), "Should return 0 for null mapField");
+        assertEquals(0, metadata.itemCount(), "Should return 0 for null mapField");
+        assertTrue(metadata.tags().isEmpty(), "Should return empty list for null mapField");
+    }
+    
+    @Test
+    @DisplayName("Metadata creation - handles empty mapField")
+    void testMetadataCreation_EmptyMapField() {
+        Sample domain = Sample.builder()
+            .id(1L)
+            .text("Test")
+            .number(100)
+            .status(Status.ACTIVE)
+            .mapField(Map.of())
+            .build();
+
+        SampleResponse response = mapper.toResponse(domain);
+
+        AggregateMetadata metadata = response.metadata();
+        assertNotNull(metadata, "Metadata should never be null");
+        assertEquals(0, metadata.totalValue(), "Should return 0 for empty mapField");
+        assertEquals(0, metadata.itemCount(), "Should return 0 for empty mapField");
+        assertTrue(metadata.tags().isEmpty(), "Should return empty list for empty mapField");
+    }
+    
+    @Test
+    @DisplayName("Entity to Domain - handles null priority with default")
+    void testToDomain_FromEntityWithNullPriority() {
+        SampleEntity entity = new SampleEntity();
+        entity.setId(1L);
+        entity.setText("Test");
+        entity.setNumber(100);
+        entity.setStatus(Status.ACTIVE);
+        entity.setPriority(null); // Null priority
+        entity.setCreatedAt(LocalDateTime.now());
+        entity.setUpdatedAt(LocalDateTime.now());
+
+        Sample domain = mapper.toDomain(entity);
+
+        assertNotNull(domain.getMapField());
+        assertEquals(5, domain.getMapField().get("priority"), "Should default to 5 when entity priority is null");
+    }
+    
+    @Test
+    @DisplayName("Domain to Entity - handles null mapField with default priority")
+    void testToEntity_NullMapField() {
+        Sample domain = Sample.builder()
+            .id(1L)
+            .text("Test")
+            .number(100)
+            .status(Status.ACTIVE)
+            .mapField(null)
+            .build();
+
+        SampleEntity entity = mapper.toEntity(domain);
+
+        assertEquals(5, entity.getPriority(), "Should default to 5 when mapField is null");
+    }
 }
