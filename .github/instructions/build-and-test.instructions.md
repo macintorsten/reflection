@@ -23,7 +23,19 @@ Before making changes to:
 
 ## Prerequisites
 
-Java (see `pom.xml` `<source>` tag) | Maven | Docker with Compose v2 (`docker compose` NOT `docker-compose`)
+**Discovery Commands:**
+```bash
+# Java version
+grep -E "<java.version>|<maven.compiler.source>" pom.xml
+
+# Spring Boot version
+grep -A 2 "<parent>" pom.xml | grep "<version>"
+
+# Database version
+grep "image:" docker-compose.yml
+```
+
+**Requirements:** Java (check pom.xml) | Maven | Docker with Compose v2 (`docker compose` NOT `docker-compose`)
 
 Build tool versions managed by Spring Boot parent in `pom.xml`. Dev environment config in `.devcontainer/devcontainer.json`.
 
@@ -63,11 +75,20 @@ docker compose up -d    # Start database
 mvn spring-boot:run     # Start app on :8080
 ```
 
-PostgreSQL 15 on port 5432: db=mydb, user=postgres, pass=secret
+**Discovery Commands:**
+```bash
+# Database configuration
+grep "image:" docker-compose.yml              # Database version
+grep "POSTGRES_" docker-compose.yml           # Database credentials
+grep "ports:" docker-compose.yml -A 1         # Database port
+
+# Application port and endpoints
+grep "server.port" src/main/resources/application.properties || echo "Default: 8080"
+find src/main/resources/static -name "*.html" # Available HTML pages
+grep -r "@.*Mapping" src/main/java --include="*Controller.java" | head -5  # API endpoints
+```
 
 Stop: `docker compose down` | Reset: `docker compose down -v && docker compose up -d`
-
-**URLs:** `/api/samples` (API) | `/index.html` (create) | `/list.html` (view)
 
 ## Validation Steps After Changes
 
