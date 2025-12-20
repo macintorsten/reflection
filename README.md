@@ -1,6 +1,6 @@
 # Reflection
 
-[![CI](https://github.com/macintorsten/reflection/workflows/CI/badge.svg)](https://github.com/macintorsten/reflection/actions/workflows/ci.yml)
+[![CI](https://github.com/macintorsten/reflection/workflows/CI/badge.svg?branch=main)](https://github.com/macintorsten/reflection/actions/workflows/ci.yml)
 
 A Java Spring Boot REST API project with PostgreSQL backend, demonstrating:
 - Spring Boot with Java 21
