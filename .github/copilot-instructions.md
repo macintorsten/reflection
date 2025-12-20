@@ -67,6 +67,7 @@ grep -A 10 "services:" docker-compose.yml
 | **Build, Test, Run** | `.github/instructions/build-and-test.instructions.md` |
 | **Code Structure** | `.github/instructions/architecture.instructions.md` |
 | **Dep Research** | `.github/skills/maven-dependency-research/SKILL.md` |
+| **TDD Workflow** | `.github/skills/tdd/SKILL.md` |
 | **Authoring** | `.github/instructions/copilot-authoring.instructions.md` |
 
 ## Agent Skills Available
@@ -80,6 +81,29 @@ grep -A 10 "services:" docker-compose.yml
 ```bash
 cd .github/skills/maven-dependency-research
 ./scripts/fetch-maven-versions.sh <groupId> <artifactId> <currentVersion> <availableVersion>
+```
+
+See `SKILL.md` in the skill directory for complete documentation.
+
+### Test Driven Development (TDD)
+**Location:** `.github/skills/tdd/`
+
+**Purpose:** Automate TDD workflow with test discovery, scaffolding, execution, and coverage analysis.
+
+**Usage:**
+```bash
+cd .github/skills/tdd
+# Discover test patterns
+./scripts/discover-test-patterns.sh
+
+# Generate test scaffold
+./scripts/generate-test-scaffold.sh <ComponentName> <type> [unit|integration]
+
+# Run targeted tests
+./scripts/run-targeted-tests.sh <TestClass>
+
+# Analyze coverage
+./scripts/analyze-coverage.sh [target]
 ```
 
 See `SKILL.md` in the skill directory for complete documentation.
