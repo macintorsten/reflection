@@ -6,4 +6,4 @@ tools: ['runCommands', 'search', 'fetch']
 
 # Maven Dependency Research Agent
 
-[Maven Dependency Research Instructions](../instructions/maven-dependency-research.instructions.md)
+[Maven Dependency Research Skill](../skills/maven-dependency-research/SKILL.md)
