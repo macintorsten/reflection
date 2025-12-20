@@ -33,7 +33,7 @@ jobs:
         key: playwright-browsers-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
     
     - name: Install Playwright browsers
-      run: mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="install --with-deps chromium"
+      run: npx playwright install --with-deps chromium
     
     - name: Run tests with Maven
       run: mvn clean verify
