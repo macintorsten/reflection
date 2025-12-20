@@ -35,6 +35,12 @@ public class SampleEntity {
     @Column(nullable = false)
     private Status status;
     
+    /**
+     * Transient field - not persisted to database.
+     * This field is used to pass additional data through the application layers
+     * but is not stored in the database as it's marked @Transient.
+     * Consider persisting this field if the data needs to be retained across sessions.
+     */
     @Transient
     private Map<String, Integer> mapField;
     

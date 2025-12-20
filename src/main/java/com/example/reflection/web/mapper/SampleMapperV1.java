@@ -24,15 +24,10 @@ public class SampleMapperV1 {
      * Converts extras Map<String, String> to mapField Map<String, Integer>.
      */
     public Sample toDomain(CreateSampleRequest request) {
-        Sample domain = Sample.builder()
-            .text(request.getText())
-            .number(request.getNumber())
-            .status(request.getStatus())
-            .build();
-            
-        // Convert extras Map<String, String> to Map<String, Integer>
+        // Convert extras Map<String, String> to Map<String, Integer> if present
+        Map<String, Integer> mapField = null;
         if (request.getExtras() != null && !request.getExtras().isEmpty()) {
-            Map<String, Integer> mapField = request.getExtras().entrySet().stream()
+            mapField = request.getExtras().entrySet().stream()
                 .collect(Collectors.toMap(
                     Map.Entry::getKey,
                     e -> {
@@ -43,10 +38,14 @@ public class SampleMapperV1 {
                         }
                     }
                 ));
-            domain.setMapField(mapField);
         }
         
-        return domain;
+        return Sample.builder()
+            .text(request.getText())
+            .number(request.getNumber())
+            .status(request.getStatus())
+            .mapField(mapField)
+            .build();
     }
     
     /**
@@ -84,25 +83,24 @@ public class SampleMapperV1 {
      * Converts mapField Map<String, Integer> to extras Map<String, String>.
      */
     public SampleResponse toResponse(Sample domain) {
-        SampleResponse response = SampleResponse.builder()
-            .id(domain.getId())
-            .text(domain.getText())
-            .number(domain.getNumber())
-            .status(domain.getStatus())
-            .createdAt(domain.getCreatedAt())
-            .updatedAt(domain.getUpdatedAt())
-            .build();
-            
-        // Convert mapField Map<String, Integer> to extras Map<String, String>
+        // Convert mapField Map<String, Integer> to extras Map<String, String> if present
+        Map<String, String> extras = null;
         if (domain.getMapField() != null && !domain.getMapField().isEmpty()) {
-            Map<String, String> extras = domain.getMapField().entrySet().stream()
+            extras = domain.getMapField().entrySet().stream()
                 .collect(Collectors.toMap(
                     Map.Entry::getKey,
                     e -> String.valueOf(e.getValue())
                 ));
-            response.setExtras(extras);
         }
         
-        return response;
+        return SampleResponse.builder()
+            .id(domain.getId())
+            .text(domain.getText())
+            .number(domain.getNumber())
+            .status(domain.getStatus())
+            .extras(extras)
+            .createdAt(domain.getCreatedAt())
+            .updatedAt(domain.getUpdatedAt())
+            .build();
     }
 }

@@ -93,7 +93,7 @@ class SampleControllerV1IntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void testCreateSample_ValidationFailure_InvalidStatus() throws Exception {
-        // Invalid enum values cause JSON parse errors (500) not validation errors (400)
+        // Invalid enum values now return 400 Bad Request (handled by JSON parser exception handler)
         mockMvc.perform(post("/api/v1/samples")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -103,7 +103,8 @@ class SampleControllerV1IntegrationTest extends AbstractIntegrationTest {
                                     "status": "invalid_status"
                                 }
                                 """))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400));
     }
 
     @Test
