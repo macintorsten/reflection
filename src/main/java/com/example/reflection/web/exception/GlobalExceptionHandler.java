@@ -1,7 +1,9 @@
-package com.example.reflection;
+package com.example.reflection.web.exception;
 
+import com.example.reflection.domain.exception.SampleNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -13,7 +15,7 @@ import java.util.List;
 
 /**
  * Global exception handler for consistent error responses across the application.
- * Catches validation exceptions and generic errors, returning structured ErrorResponse objects.
+ * Catches validation exceptions, domain exceptions, JSON parsing errors, and generic errors.
  */
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -42,6 +44,40 @@ public class GlobalExceptionHandler {
         );
 
         return ResponseEntity.badRequest().body(errorResponse);
+    }
+
+    /**
+     * Handles JSON parsing errors (e.g., invalid enum values, malformed JSON).
+     * Returns 400 Bad Request instead of 500 Internal Server Error.
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<ErrorResponse> handleJsonParseException(HttpMessageNotReadableException ex) {
+        String message = "Invalid request format";
+        if (ex.getMessage() != null && ex.getMessage().contains("not one of the values accepted for Enum class")) {
+            message = "Invalid enum value provided";
+        }
+        
+        ErrorResponse errorResponse = new ErrorResponse(
+            message,
+            HttpStatus.BAD_REQUEST.value(),
+            Instant.now().toString()
+        );
+        return ResponseEntity.badRequest().body(errorResponse);
+    }
+
+    /**
+     * Handles SampleNotFoundException from domain layer.
+     * Returns 404 Not Found with error details.
+     */
+    @ExceptionHandler(SampleNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleSampleNotFound(SampleNotFoundException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(
+            ex.getMessage(),
+            HttpStatus.NOT_FOUND.value(),
+            Instant.now().toString()
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
     /**

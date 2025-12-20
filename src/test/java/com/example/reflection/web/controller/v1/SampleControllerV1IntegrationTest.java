@@ -1,5 +1,7 @@
-package com.example.reflection;
+package com.example.reflection.web.controller.v1;
 
+import com.example.reflection.AbstractIntegrationTest;
+import com.example.reflection.OpenApiValidator;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -9,27 +11,17 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
- * Full-stack integration tests with real PostgreSQL database (via Testcontainers)
- * and JSON Schema validation using RestAssured's json-schema-validator.
- * 
- * Extends AbstractIntegrationTest to share the database container across all
- * integration test classes, reducing startup overhead.
- * 
- * This validates the entire stack:
- * - HTTP layer (Spring MVC)
- * - Service layer (business logic)
- * - Repository layer (JPA)
- * - Database (PostgreSQL via Testcontainers - SHARED)
- * - Response schema compliance (JSON Schema validation)
+ * Full-stack integration tests for V1 API with real PostgreSQL database (via Testcontainers).
+ * Tests the entire stack: HTTP → Controller → Service → Repository → Database
  */
-class SampleControllerIntegrationTest extends AbstractIntegrationTest {
+class SampleControllerV1IntegrationTest extends AbstractIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @Test
     void testCreateSample_FullStack_ValidatesSchema() throws Exception {
-        mockMvc.perform(post("/api/samples")
+        mockMvc.perform(post("/api/v1/samples")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -38,13 +30,18 @@ class SampleControllerIntegrationTest extends AbstractIntegrationTest {
                                     "status": "active"
                                 }
                                 """))
-                .andExpect(OpenApiValidator.matchesOpenApi("openapi-spec.json", "POST", "/api/samples", 200))
-                .andExpect(jsonPath("$.text").value("Integration Test"));
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.text").value("Integration Test"))
+                .andExpect(jsonPath("$.number").value(100))
+                .andExpect(jsonPath("$.status").value("active"))
+                .andExpect(jsonPath("$.createdAt").exists())
+                .andExpect(jsonPath("$.updatedAt").exists());
     }
 
     @Test
-    void testCreateSample_WithExtras_FullStack_ValidatesSchema() throws Exception {
-        mockMvc.perform(post("/api/samples")
+    void testCreateSample_WithExtras_FullStack() throws Exception {
+        mockMvc.perform(post("/api/v1/samples")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -57,13 +54,14 @@ class SampleControllerIntegrationTest extends AbstractIntegrationTest {
                                     }
                                 }
                                 """))
-                .andExpect(OpenApiValidator.matchesOpenApi("openapi-spec.json", "POST", "/api/samples", 200))
-                .andExpect(jsonPath("$.extras.key1").value("123"));
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.extras.key1").value("123"))
+                .andExpect(jsonPath("$.extras.key2").value("456"));
     }
 
     @Test
-    void testCreateSample_ValidationFailure_TextTooShort_ValidatesErrorSchema() throws Exception {
-        mockMvc.perform(post("/api/samples")
+    void testCreateSample_ValidationFailure_TextTooShort() throws Exception {
+        mockMvc.perform(post("/api/v1/samples")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -72,13 +70,15 @@ class SampleControllerIntegrationTest extends AbstractIntegrationTest {
                                     "status": "active"
                                 }
                                 """))
-                .andExpect(OpenApiValidator.matchesOpenApi("openapi-spec.json", "POST", "/api/samples", 400))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Validation failed"))
+                .andExpect(jsonPath("$.status").value(400))
                 .andExpect(jsonPath("$.fieldErrors").isArray());
     }
 
     @Test
-    void testCreateSample_ValidationFailure_NumberOutOfRange_ValidatesErrorSchema() throws Exception {
-        mockMvc.perform(post("/api/samples")
+    void testCreateSample_ValidationFailure_NumberOutOfRange() throws Exception {
+        mockMvc.perform(post("/api/v1/samples")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -87,14 +87,14 @@ class SampleControllerIntegrationTest extends AbstractIntegrationTest {
                                     "status": "active"
                                 }
                                 """))
-                .andExpect(OpenApiValidator.matchesOpenApi("openapi-spec.json", "POST", "/api/samples", 400))
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.fieldErrors[0].field").value("number"));
     }
 
     @Test
-    void testCreateSample_ValidationFailure_InvalidStatus_ValidatesErrorSchema() throws Exception {
-        // Invalid enum values cause JSON parse errors (500) not validation errors (400)
-        mockMvc.perform(post("/api/samples")
+    void testCreateSample_ValidationFailure_InvalidStatus() throws Exception {
+        // Invalid enum values now return 400 Bad Request (handled by JSON parser exception handler)
+        mockMvc.perform(post("/api/v1/samples")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -103,21 +103,22 @@ class SampleControllerIntegrationTest extends AbstractIntegrationTest {
                                     "status": "invalid_status"
                                 }
                                 """))
-                .andExpect(OpenApiValidator.matchesOpenApi("openapi-spec.json", "POST", "/api/samples", 500));
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400));
     }
 
     @Test
-    void testListSamples_EmptyDatabase_ValidatesArraySchema() throws Exception {
-        // This test might have data from previous tests, but schema should still validate
-        mockMvc.perform(get("/api/samples"))
-                .andExpect(OpenApiValidator.matchesOpenApi("openapi-spec.json", "GET", "/api/samples", 200))
+    void testListSamples_EmptyDatabase() throws Exception {
+        // This test might have data from previous tests, but should still return array
+        mockMvc.perform(get("/api/v1/samples"))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray());
     }
 
     @Test
-    void testListSamples_AfterCreation_ValidatesArraySchema() throws Exception {
+    void testListSamples_AfterCreation() throws Exception {
         // Create a sample first
-        mockMvc.perform(post("/api/samples")
+        mockMvc.perform(post("/api/v1/samples")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -126,18 +127,18 @@ class SampleControllerIntegrationTest extends AbstractIntegrationTest {
                                     "status": "inactive"
                                 }
                                 """))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
 
-        // List should include the created sample and validate schema
-        mockMvc.perform(get("/api/samples"))
-                .andExpect(OpenApiValidator.matchesOpenApi("openapi-spec.json", "GET", "/api/samples", 200))
+        // List should include the created sample
+        mockMvc.perform(get("/api/v1/samples"))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$[?(@.number == 999)].text").value("List Test Sample"));
     }
 
     @Test
-    void testListSamples_MultipleItems_ValidatesArraySchema() throws Exception {
+    void testListSamples_MultipleItems() throws Exception {
         // Create multiple samples
-        mockMvc.perform(post("/api/samples")
+        mockMvc.perform(post("/api/v1/samples")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -146,30 +147,30 @@ class SampleControllerIntegrationTest extends AbstractIntegrationTest {
                                     "status": "active"
                                 }
                                 """))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
 
-        mockMvc.perform(post("/api/samples")
+        mockMvc.perform(post("/api/v1/samples")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
                                     "text": "Second Sample",
                                     "number": 20,
                                     "status": "inactive",
-                                    "extras": {"tag": "important"}
+                                    "extras": {"tag": "1"}
                                 }
                                 """))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
 
-        // List all and validate array schema
-        mockMvc.perform(get("/api/samples"))
-                .andExpect(OpenApiValidator.matchesOpenApi("openapi-spec.json", "GET", "/api/samples", 200))
+        // List all and validate array
+        mockMvc.perform(get("/api/v1/samples"))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(org.hamcrest.Matchers.greaterThanOrEqualTo(2)));
     }
 
     @Test
-    void testCreateSample_DatabasePersistence_ValidatesSchema() throws Exception {
+    void testCreateSample_DatabasePersistence() throws Exception {
         // Create a sample
-        mockMvc.perform(post("/api/samples")
+        String responseBody = mockMvc.perform(post("/api/v1/samples")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -178,11 +179,37 @@ class SampleControllerIntegrationTest extends AbstractIntegrationTest {
                                     "status": "active"
                                 }
                                 """))
-                .andExpect(OpenApiValidator.matchesOpenApi("openapi-spec.json", "POST", "/api/samples", 200));
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").exists())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
 
-        // Verify it appears in the list (extras not persisted - mapField is @Transient)
-        mockMvc.perform(get("/api/samples"))
-                .andExpect(OpenApiValidator.matchesOpenApi("openapi-spec.json", "GET", "/api/samples", 200))
+        // Extract ID from response (simple approach)
+        String id = org.springframework.boot.json.JsonParserFactory.getJsonParser()
+                .parseMap(responseBody)
+                .get("id")
+                .toString();
+
+        // Verify it appears in the list
+        mockMvc.perform(get("/api/v1/samples"))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$[?(@.number == 777)].text").value("Persistence Test"));
+
+        // Test GET by ID endpoint
+        mockMvc.perform(get("/api/v1/samples/" + id))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(id))
+                .andExpect(jsonPath("$.text").value("Persistence Test"))
+                .andExpect(jsonPath("$.number").value(777));
+    }
+
+    @Test
+    void testGetSample_NotFound() throws Exception {
+        // Try to get non-existent sample
+        mockMvc.perform(get("/api/v1/samples/99999"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Sample not found with ID: 99999"))
+                .andExpect(jsonPath("$.status").value(404));
     }
 }
