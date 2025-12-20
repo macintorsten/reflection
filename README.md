@@ -1,6 +1,6 @@
 # Reflection
 
-[![CI](https://github.com/macintorsten/reflection/workflows/CI/badge.svg?branch=main)](https://github.com/macintorsten/reflection/actions/workflows/ci.yml)
+[![CI](https://github.com/macintorsten/reflection/actions/workflows/ci.yml/badge.svg)](https://github.com/macintorsten/reflection/actions/workflows/ci.yml)
 
 A Java Spring Boot REST API project with PostgreSQL backend, demonstrating:
 - Spring Boot with Java 21
@@ -41,6 +41,8 @@ The application will be available at http://localhost:8080
 - `GET /v3/api-docs` - OpenAPI specification (when app is running)
 
 ### API Documentation
+
+[![Deploy API Documentation](https://github.com/macintorsten/reflection/actions/workflows/deploy-docs.yml/badge.svg)](https://github.com/macintorsten/reflection/actions/workflows/deploy-docs.yml)
 
 Static API documentation is available at: **https://macintorsten.github.io/reflection/**
 
