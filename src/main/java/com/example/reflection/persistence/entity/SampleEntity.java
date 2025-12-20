@@ -30,6 +30,13 @@ public class SampleEntity {
     private Status status;
     
     /**
+     * Priority level for the sample (1-10).
+     * Added in V2 API. Nullable for backward compatibility with V1 data.
+     */
+    @Column(name = "priority")
+    private Integer priority;
+    
+    /**
      * Transient field - not persisted to database.
      * This field is used to pass additional data through the application layers
      * but is not stored in the database as it's marked @Transient.
@@ -77,6 +84,14 @@ public class SampleEntity {
     
     public void setStatus(Status status) {
         this.status = status;
+    }
+    
+    public Integer getPriority() {
+        return priority;
+    }
+    
+    public void setPriority(Integer priority) {
+        this.priority = priority;
     }
     
     public Map<String, Integer> getMapField() {

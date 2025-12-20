@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sample API V2 - Dashboard with Analytics</title>
+    <link rel="stylesheet" href="shared-styles.css">
+    <style>
+        /* V2-Specific Styles */
+        body {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+
+        .header h1 {
+            color: #11998e;
+        }
+
+        .version-badge {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+
+        .api-switch a {
+            color: #11998e;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #11998e;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: #11998e;
+        }
+
+        .priority-slider {
+            width: 100%;
+        }
+
+        .priority-value {
+            display: inline-block;
+            background: #11998e;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+
+        .btn:hover {
+            box-shadow: 0 5px 20px rgba(17, 153, 142, 0.4);
+        }
+
+        .sample-item {
+            border-left-color: #11998e;
+        }
+
+        .sample-item strong {
+            color: #11998e;
+        }
+
+        .priority-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 5px;
+        }
+
+        .priority-high {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .priority-medium {
+            background: #ffa502;
+            color: white;
+        }
+
+        .priority-low {
+            background: #70a1ff;
+            color: white;
+        }
+
+        .metadata {
+            margin-top: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .metadata-item {
+            display: inline-block;
+            margin-right: 15px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Sample API Dashboard</h1>
+            <span class="version-badge">Version 2.0</span>
+            <span class="breaking-badge">Breaking Changes</span>
+            <div class="api-switch">
+                <p>Switch to: <a href="v1-ui.html">← API V1 (Legacy)</a></p>
+            </div>
+            <div class="new-feature" style="margin-top: 15px;">
+                <strong>✨ What's New in V2:</strong> Priority levels (1-10), Structured metadata, Real-time statistics & aggregation
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>📊 Total Samples</h3>
+                <div class="value" id="statTotal">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>📈 Avg Number</h3>
+                <div class="value" id="statAvgNum">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>⭐ Avg Priority</h3>
+                <div class="value" id="statAvgPri">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>✅ Active</h3>
+                <div class="value" id="statActive">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>💤 Inactive</h3>
+                <div class="value" id="statInactive">0</div>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <h2>➕ Create New Sample (V2)</h2>
+                <div id="createMessage"></div>
+                <form id="createForm">
+                    <div class="form-group">
+                        <label for="text">Text *</label>
+                        <input type="text" id="text" name="text" required minlength="3" maxlength="100" placeholder="Enter sample text (3-100 chars)">
+                    </div>
+                    <div class="form-group">
+                        <label for="number">Number *</label>
+                        <input type="number" id="number" name="number" required min="0" max="1000" placeholder="Enter number (0-1000)">
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Status *</label>
+                        <select id="status" name="status" required>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="priority">Priority (1-10) <span class="priority-value" id="priorityValue">5</span></label>
+                        <input type="range" id="priority" name="priority" min="1" max="10" value="5" class="priority-slider">
+                    </div>
+                    <button type="submit" class="btn">Create Sample</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>🔍 Get Sample by ID</h2>
+                <div id="getByIdMessage"></div>
+                <form id="getByIdForm">
+                    <div class="form-group">
+                        <label for="sampleId">Sample ID</label>
+                        <input type="number" id="sampleId" name="sampleId" required min="1" placeholder="Enter sample ID">
+                    </div>
+                    <button type="submit" class="btn">Get Sample</button>
+                </form>
+                <div id="sampleDetail" style="margin-top: 20px;"></div>
+            </div>
+        </div>
+
+        <div class="card samples-list">
+            <h2>📋 All Samples</h2>
+            <button onclick="loadSamplesAndStats()" class="btn" style="width: auto; margin-bottom: 20px;">🔄 Refresh List & Statistics</button>
+            <div id="samplesList"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api/v2/samples';
+
+        // Load samples and stats on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSamplesAndStats();
+            
+            // Update priority value display
+            document.getElementById('priority').addEventListener('input', (e) => {
+                document.getElementById('priorityValue').textContent = e.target.value;
+            });
+        });
+
+        // Create sample form
+        document.getElementById('createForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const messageDiv = document.getElementById('createMessage');
+            
+            const data = {
+                text: document.getElementById('text').value,
+                number: parseInt(document.getElementById('number').value),
+                status: document.getElementById('status').value,
+                priority: parseInt(document.getElementById('priority').value)
+            };
+
+            try {
+                const response = await fetch(API_BASE, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    const created = await response.json();
+                    messageDiv.innerHTML = `<div class="message success">✅ Sample created with ID: ${created.id}</div>`;
+                    document.getElementById('createForm').reset();
+                    document.getElementById('priority').value = 5;
+                    document.getElementById('priorityValue').textContent = '5';
+                    loadSamplesAndStats();
+                } else {
+                    const error = await response.json();
+                    messageDiv.innerHTML = `<div class="message error">❌ Error: ${error.message}</div>`;
+                }
+            } catch (error) {
+                messageDiv.innerHTML = `<div class="message error">❌ Network error: ${error.message}</div>`;
+            }
+        });
+
+        // Get by ID form
+        document.getElementById('getByIdForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const messageDiv = document.getElementById('getByIdMessage');
+            const detailDiv = document.getElementById('sampleDetail');
+            const id = document.getElementById('sampleId').value;
+
+            try {
+                const response = await fetch(`${API_BASE}/${id}`);
+                
+                if (response.ok) {
+                    const sample = await response.json();
+                    detailDiv.innerHTML = renderSampleDetail(sample);
+                    messageDiv.innerHTML = '';
+                } else {
+                    const error = await response.json();
+                    messageDiv.innerHTML = `<div class="message error">❌ ${error.message}</div>`;
+                    detailDiv.innerHTML = '';
+                }
+            } catch (error) {
+                messageDiv.innerHTML = `<div class="message error">❌ Network error: ${error.message}</div>`;
+                detailDiv.innerHTML = '';
+            }
+        });
+
+        // Load statistics
+        async function loadStatistics() {
+            try {
+                const response = await fetch(`${API_BASE}/statistics`);
+                const stats = await response.json();
+
+                document.getElementById('statTotal').textContent = stats.totalCount;
+                document.getElementById('statAvgNum').textContent = stats.averageNumber.toFixed(1);
+                document.getElementById('statAvgPri').textContent = stats.averagePriority.toFixed(1);
+                document.getElementById('statActive').textContent = stats.countByStatus.ACTIVE || 0;
+                document.getElementById('statInactive').textContent = stats.countByStatus.INACTIVE || 0;
+            } catch (error) {
+                console.error('Failed to load statistics:', error);
+            }
+        }
+
+        // Load all samples
+        async function loadSamples() {
+            const listDiv = document.getElementById('samplesList');
+            listDiv.innerHTML = '<p style="text-align: center; color: #999;">Loading...</p>';
+
+            try {
+                const response = await fetch(API_BASE);
+                const samples = await response.json();
+
+                if (samples.length === 0) {
+                    listDiv.innerHTML = '<div class="empty-state">📭 No samples yet. Create your first sample above!</div>';
+                    return;
+                }
+
+                listDiv.innerHTML = samples.map(sample => `
+                    <div class="sample-item">
+                        <strong>ID:</strong> ${sample.id} | 
+                        <strong>Text:</strong> ${sample.text} | 
+                        <strong>Number:</strong> ${sample.number} | 
+                        <strong>Status:</strong> <span class="status-${sample.status}">${sample.status}</span> |
+                        <strong>Priority:</strong> ${getPriorityBadge(sample.priority)}
+                        <div class="metadata">
+                            <span class="metadata-item">📊 Total Value: ${sample.metadata.totalValue}</span>
+                            <span class="metadata-item">🔢 Item Count: ${sample.metadata.itemCount}</span>
+                            <span class="metadata-item">🏷️ Tags: ${sample.metadata.tags.length}</span>
+                        </div>
+                        <div style="margin-top: 5px; font-size: 12px; color: #999;">
+                            Created: ${new Date(sample.createdAt).toLocaleString()}
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                listDiv.innerHTML = `<div class="message error">❌ Failed to load samples: ${error.message}</div>`;
+            }
+        }
+
+        function loadSamplesAndStats() {
+            loadSamples();
+            loadStatistics();
+        }
+
+        function getPriorityBadge(priority) {
+            let className = 'priority-low';
+            if (priority >= 8) className = 'priority-high';
+            else if (priority >= 5) className = 'priority-medium';
+            return `<span class="priority-badge ${className}">${priority}</span>`;
+        }
+
+        function renderSampleDetail(sample) {
+            return `
+                <div class="sample-item">
+                    <div><strong>ID:</strong> ${sample.id}</div>
+                    <div><strong>Text:</strong> ${sample.text}</div>
+                    <div><strong>Number:</strong> ${sample.number}</div>
+                    <div><strong>Status:</strong> <span class="status-${sample.status}">${sample.status}</span></div>
+                    <div><strong>Priority:</strong> ${getPriorityBadge(sample.priority)}</div>
+                    <div class="metadata">
+                        <div><strong>Metadata:</strong></div>
+                        <div class="metadata-item">📊 Total Value: ${sample.metadata.totalValue}</div>
+                        <div class="metadata-item">🔢 Item Count: ${sample.metadata.itemCount}</div>
+                        <div class="metadata-item">🏷️ Tags: ${sample.metadata.tags.join(', ') || 'None'}</div>
+                    </div>
+                    <div style="margin-top: 10px; font-size: 12px; color: #999;">
+                        <div>Created: ${new Date(sample.createdAt).toLocaleString()}</div>
+                        <div>Updated: ${new Date(sample.updatedAt).toLocaleString()}</div>
+                    </div>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

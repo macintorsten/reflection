@@ -50,6 +50,7 @@ public class SampleMapperV1 {
     
     /**
      * Convert Domain object to Entity for persistence.
+     * Extracts priority from mapField if present for V2 compatibility.
      */
     public SampleEntity toEntity(Sample domain) {
         SampleEntity entity = new SampleEntity();
@@ -58,6 +59,12 @@ public class SampleMapperV1 {
         entity.setNumber(domain.getNumber());
         entity.setStatus(domain.getStatus());
         entity.setMapField(domain.getMapField());
+        
+        // Extract priority from mapField for persistence (V2 compatibility)
+        if (domain.getMapField() != null && domain.getMapField().containsKey("priority")) {
+            entity.setPriority(domain.getMapField().get("priority"));
+        }
+        
         entity.setCreatedAt(domain.getCreatedAt());
         entity.setUpdatedAt(domain.getUpdatedAt());
         return entity;
@@ -65,14 +72,28 @@ public class SampleMapperV1 {
     
     /**
      * Convert Entity to Domain object.
+     * Loads priority into mapField if present for V2 compatibility.
      */
     public Sample toDomain(SampleEntity entity) {
+        // Include priority in mapField if present in entity
+        Map<String, Integer> mapField = entity.getMapField();
+        if (entity.getPriority() != null) {
+            if (mapField == null) {
+                mapField = Map.of("priority", entity.getPriority());
+            } else {
+                // Merge priority into existing mapField
+                var mutableMap = new java.util.HashMap<>(mapField);
+                mutableMap.put("priority", entity.getPriority());
+                mapField = mutableMap;
+            }
+        }
+        
         return Sample.builder()
             .id(entity.getId())
             .text(entity.getText())
             .number(entity.getNumber())
             .status(entity.getStatus())
-            .mapField(entity.getMapField())
+            .mapField(mapField)
             .createdAt(entity.getCreatedAt())
             .updatedAt(entity.getUpdatedAt())
             .build();

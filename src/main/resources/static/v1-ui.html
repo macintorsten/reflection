@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sample API V1 - Dashboard</title>
+    <link rel="stylesheet" href="shared-styles.css">
+    <style>
+        /* V1-Specific Styles */
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .header h1 {
+            color: #667eea;
+        }
+
+        .version-badge {
+            background: #667eea;
+        }
+
+        .api-switch a {
+            color: #764ba2;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .btn:hover {
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .sample-item {
+            border-left-color: #667eea;
+        }
+
+        .sample-item strong {
+            color: #667eea;
+        }
+
+        .sample-item .extras {
+            margin-top: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .extras-input {
+            font-family: monospace;
+            font-size: 12px;
+        }
+
+        .container {
+            max-width: 1200px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Sample API Dashboard</h1>
+            <span class="version-badge">Version 1.0</span>
+            <div class="api-switch">
+                <p>Switch to: <a href="v2-ui.html">API V2 (with Priority & Statistics) →</a></p>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <h2>➕ Create New Sample</h2>
+                <div id="createMessage"></div>
+                <form id="createForm">
+                    <div class="form-group">
+                        <label for="text">Text *</label>
+                        <input type="text" id="text" name="text" required minlength="3" maxlength="100" placeholder="Enter sample text (3-100 chars)">
+                    </div>
+                    <div class="form-group">
+                        <label for="number">Number *</label>
+                        <input type="number" id="number" name="number" required min="0" max="1000" placeholder="Enter number (0-1000)">
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Status *</label>
+                        <select id="status" name="status" required>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="extras">Extras (JSON)</label>
+                        <textarea id="extras" name="extras" rows="3" class="extras-input" placeholder='{"key": "value"}'></textarea>
+                        <small style="color: #666;">Optional: Enter key-value pairs as JSON</small>
+                    </div>
+                    <button type="submit" class="btn">Create Sample</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>🔍 Get Sample by ID</h2>
+                <div id="getByIdMessage"></div>
+                <form id="getByIdForm">
+                    <div class="form-group">
+                        <label for="sampleId">Sample ID</label>
+                        <input type="number" id="sampleId" name="sampleId" required min="1" placeholder="Enter sample ID">
+                    </div>
+                    <button type="submit" class="btn">Get Sample</button>
+                </form>
+                <div id="sampleDetail" style="margin-top: 20px;"></div>
+            </div>
+        </div>
+
+        <div class="card samples-list">
+            <h2>📋 All Samples</h2>
+            <button onclick="loadSamples()" class="btn" style="width: auto; margin-bottom: 20px;">🔄 Refresh List</button>
+            <div id="samplesList"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api/v1/samples';
+
+        // Load samples on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSamples();
+        });
+
+        // Create sample form
+        document.getElementById('createForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const messageDiv = document.getElementById('createMessage');
+            
+            const data = {
+                text: document.getElementById('text').value,
+                number: parseInt(document.getElementById('number').value),
+                status: document.getElementById('status').value
+            };
+
+            // Parse extras if provided
+            const extrasInput = document.getElementById('extras').value.trim();
+            if (extrasInput) {
+                try {
+                    data.extras = JSON.parse(extrasInput);
+                } catch (e) {
+                    messageDiv.innerHTML = '<div class="message error">Invalid JSON in extras field</div>';
+                    return;
+                }
+            }
+
+            try {
+                const response = await fetch(API_BASE, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    const created = await response.json();
+                    messageDiv.innerHTML = `<div class="message success">✅ Sample created with ID: ${created.id}</div>`;
+                    document.getElementById('createForm').reset();
+                    loadSamples();
+                } else {
+                    const error = await response.json();
+                    messageDiv.innerHTML = `<div class="message error">❌ Error: ${error.message}</div>`;
+                }
+            } catch (error) {
+                messageDiv.innerHTML = `<div class="message error">❌ Network error: ${error.message}</div>`;
+            }
+        });
+
+        // Get by ID form
+        document.getElementById('getByIdForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const messageDiv = document.getElementById('getByIdMessage');
+            const detailDiv = document.getElementById('sampleDetail');
+            const id = document.getElementById('sampleId').value;
+
+            try {
+                const response = await fetch(`${API_BASE}/${id}`);
+                
+                if (response.ok) {
+                    const sample = await response.json();
+                    detailDiv.innerHTML = renderSampleDetail(sample);
+                    messageDiv.innerHTML = '';
+                } else {
+                    const error = await response.json();
+                    messageDiv.innerHTML = `<div class="message error">❌ ${error.message}</div>`;
+                    detailDiv.innerHTML = '';
+                }
+            } catch (error) {
+                messageDiv.innerHTML = `<div class="message error">❌ Network error: ${error.message}</div>`;
+                detailDiv.innerHTML = '';
+            }
+        });
+
+        // Load all samples
+        async function loadSamples() {
+            const listDiv = document.getElementById('samplesList');
+            listDiv.innerHTML = '<p style="text-align: center; color: #999;">Loading...</p>';
+
+            try {
+                const response = await fetch(API_BASE);
+                const samples = await response.json();
+
+                if (samples.length === 0) {
+                    listDiv.innerHTML = '<div class="empty-state">📭 No samples yet. Create your first sample above!</div>';
+                    return;
+                }
+
+                listDiv.innerHTML = samples.map(sample => `
+                    <div class="sample-item">
+                        <strong>ID:</strong> ${sample.id} | 
+                        <strong>Text:</strong> ${sample.text} | 
+                        <strong>Number:</strong> ${sample.number} | 
+                        <strong>Status:</strong> <span class="status-${sample.status}">${sample.status}</span>
+                        ${sample.extras ? `<div class="extras"><strong>Extras:</strong> ${JSON.stringify(sample.extras)}</div>` : ''}
+                        <div style="margin-top: 5px; font-size: 12px; color: #999;">
+                            Created: ${new Date(sample.createdAt).toLocaleString()}
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                listDiv.innerHTML = `<div class="message error">❌ Failed to load samples: ${error.message}</div>`;
+            }
+        }
+
+        function renderSampleDetail(sample) {
+            return `
+                <div class="sample-item">
+                    <div><strong>ID:</strong> ${sample.id}</div>
+                    <div><strong>Text:</strong> ${sample.text}</div>
+                    <div><strong>Number:</strong> ${sample.number}</div>
+                    <div><strong>Status:</strong> <span class="status-${sample.status}">${sample.status}</span></div>
+                    ${sample.extras ? `<div class="extras"><strong>Extras:</strong> ${JSON.stringify(sample.extras, null, 2)}</div>` : ''}
+                    <div style="margin-top: 10px; font-size: 12px; color: #999;">
+                        <div>Created: ${new Date(sample.createdAt).toLocaleString()}</div>
+                        <div>Updated: ${new Date(sample.updatedAt).toLocaleString()}</div>
+                    </div>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

@@ -3,115 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sample Manager - Create</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Reflection API</title>
     <style>
-        .container { max-width: 800px; }
-        button[type="submit"] { width: 100%; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            background: white;
+            border-radius: 20px;
+            padding: 50px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 18px;
+            margin-bottom: 40px;
+        }
+
+        .api-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .api-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .api-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 12px;
+            padding: 30px;
+            text-decoration: none;
+            color: #333;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .api-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border-color: #667eea;
+        }
+
+        .api-card.v1 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .api-card.v2 {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+
+        .api-card h2 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .api-card p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.3);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .links {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .button {
+            display: inline-block;
+            background: white;
+            color: #667eea;
+            padding: 12px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            border: 2px solid #667eea;
+            transition: all 0.3s;
+        }
+
+        .button:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .feature-list {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 30px;
+            text-align: left;
+        }
+
+        .feature-list h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .feature-list ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            padding: 8px 0;
+            color: #666;
+        }
+
+        .feature-list li:before {
+            content: "✓ ";
+            color: #28a745;
+            font-weight: bold;
+            margin-right: 10px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>📝 Sample Manager</h1>
+        <h1>🎯 Reflection API</h1>
+        <p class="subtitle">Spring Boot REST API with Versioned Endpoints</p>
         
-        <nav class="nav">
-            <a href="index.html">Create New</a>
-            <a href="list.html">View All</a>
-        </nav>
-
-        <div class="card">
-            <h2>Create New Sample</h2>
+        <div class="api-grid">
+            <a href="v1-ui.html" class="api-card v1">
+                <h2>API V1</h2>
+                <p>Original REST API with basic CRUD operations</p>
+                <span class="badge">Legacy Support</span>
+            </a>
             
-            <form id="sampleForm">
-                <div class="form-group">
-                    <label for="text">Text *</label>
-                    <input 
-                        type="text" 
-                        id="text" 
-                        name="text" 
-                        required 
-                        minlength="3" 
-                        maxlength="100"
-                        placeholder="Enter text (3-100 characters)">
-                    <small>Between 3 and 100 characters</small>
-                </div>
+            <a href="v2-ui.html" class="api-card v2">
+                <h2>API V2</h2>
+                <p>Enhanced API with priorities, metadata & statistics</p>
+                <span class="badge">Latest Version</span>
+            </a>
+        </div>
 
-                <div class="form-group">
-                    <label for="number">Number *</label>
-                    <input 
-                        type="number" 
-                        id="number" 
-                        name="number" 
-                        required 
-                        min="0" 
-                        max="1000"
-                        step="1"
-                        placeholder="Enter number (0-1000)">
-                    <small>Integer between 0 and 1000</small>
-                </div>
+        <div class="feature-list">
+            <h3>📚 Available Resources</h3>
+            <ul>
+                <li>Interactive V1 Dashboard - Simple CRUD operations</li>
+                <li>Interactive V2 Dashboard - Advanced features with analytics</li>
+                <li>OpenAPI/Swagger Documentation - Complete API reference</li>
+                <li>RESTful endpoints with JSON responses</li>
+                <li>Comprehensive validation and error handling</li>
+            </ul>
+        </div>
 
-                <div class="form-group">
-                    <label for="status">Status *</label>
-                    <select id="status" name="status" required>
-                        <option value="">-- Select Status --</option>
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                    </select>
-                </div>
-
-                <button type="submit">Create Sample</button>
-            </form>
-
-            <div id="message" class="message"></div>
+        <div class="links" style="margin-top: 30px;">
+            <a href="/swagger-ui.html" class="button">📖 API Documentation</a>
         </div>
     </div>
-
-    <script>
-        const form = document.getElementById('sampleForm');
-        const messageDiv = document.getElementById('message');
-
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            // HTML5 validation already handled by browser
-            const formData = new FormData(form);
-            const data = {
-                text: formData.get('text'),
-                number: parseInt(formData.get('number'), 10),
-                status: formData.get('status'),
-                extras: null
-            };
-
-            const button = form.querySelector('button[type="submit"]');
-            button.disabled = true;
-            button.textContent = 'Creating...';
-
-            try {
-                const response = await fetch('/api/samples', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-
-                messageDiv.className = 'message';
-                
-                if (response.ok) {
-                    messageDiv.classList.add('success', 'show');
-                    messageDiv.textContent = '✓ Sample created successfully!';
-                    form.reset();
-                } else {
-                    const error = await response.json();
-                    messageDiv.classList.add('error', 'show');
-                    messageDiv.textContent = '✗ Error: ' + (error.message || 'Failed to create sample');
-                }
-            } catch (error) {
-                messageDiv.className = 'message error show';
-                messageDiv.textContent = '✗ Network error: ' + error.message;
-            } finally {
-                button.disabled = false;
-                button.textContent = 'Create Sample';
-            }
-        });
-    </script>
 </body>
 </html>

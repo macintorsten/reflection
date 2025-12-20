@@ -2,8 +2,10 @@ package com.example.reflection.service;
 
 import com.example.reflection.domain.exception.SampleNotFoundException;
 import com.example.reflection.domain.model.Sample;
+import com.example.reflection.domain.model.Status;
 import com.example.reflection.persistence.entity.SampleEntity;
 import com.example.reflection.persistence.repository.SampleRepository;
+import com.example.reflection.web.dto.v2.response.StatisticsResponse;
 import com.example.reflection.web.mapper.SampleMapperV1;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,5 +81,57 @@ public class SampleService {
         return repository.findById(id)
             .map(mapper::toDomain)
             .orElseThrow(() -> new SampleNotFoundException("Sample not found with ID: " + id));
+    }
+    
+    /**
+     * Get aggregate statistics for all samples.
+     * NEW method for V2 API - calculates aggregate data.
+     * 
+     * @return aggregate statistics
+     */
+    public StatisticsResponse getStatistics() {
+        log.debug("Calculating sample statistics");
+        
+        List<Sample> allSamples = listSamples();
+        
+        long totalCount = allSamples.size();
+        
+        // Calculate average number
+        double averageNumber = allSamples.isEmpty() ? 0.0 : 
+            allSamples.stream()
+                .mapToInt(Sample::getNumber)
+                .average()
+                .orElse(0.0);
+        
+        // Calculate total sum
+        long totalNumberSum = allSamples.stream()
+            .mapToInt(Sample::getNumber)
+            .sum();
+        
+        // Count by status
+        java.util.Map<String, Long> countByStatus = allSamples.stream()
+            .collect(java.util.stream.Collectors.groupingBy(
+                s -> s.getStatus().name(),
+                java.util.stream.Collectors.counting()
+            ));
+        
+        // Calculate average priority (default to 5 if no mapField)
+        double averagePriority = allSamples.isEmpty() ? 5.0 :
+            allSamples.stream()
+                .mapToInt(s -> s.getMapField() != null ? 
+                    s.getMapField().getOrDefault("priority", 5) : 5)
+                .average()
+                .orElse(5.0);
+        
+        log.info("Statistics calculated: {} samples, avg number: {}, avg priority: {}", 
+            totalCount, averageNumber, averagePriority);
+        
+        return new StatisticsResponse(
+            totalCount,
+            averageNumber,
+            totalNumberSum,
+            countByStatus,
+            averagePriority
+        );
     }
 }

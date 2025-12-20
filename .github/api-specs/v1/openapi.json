@@ -17,18 +17,22 @@
     ],
     "tags": [
         {
+            "name": "Samples V2",
+            "description": "Version 2 of Sample operations with aggregation support"
+        },
+        {
             "name": "Samples V1",
             "description": "Version 1 of Sample operations"
         }
     ],
     "paths": {
-        "/api/v1/samples": {
+        "/api/v2/samples": {
             "get": {
                 "tags": [
-                    "Samples V1"
+                    "Samples V2"
                 ],
-                "summary": "List samples",
-                "description": "Returns all Sample entities",
+                "summary": "List samples (V2)",
+                "description": "Returns all Samples with V2 response format",
                 "operationId": "listSamples",
                 "responses": {
                     "400": {
@@ -68,10 +72,10 @@
             },
             "post": {
                 "tags": [
-                    "Samples V1"
+                    "Samples V2"
                 ],
-                "summary": "Create a sample",
-                "description": "Creates a new Sample entity",
+                "summary": "Create a sample (V2)",
+                "description": "Creates a new Sample with priority support",
                 "operationId": "createSample",
                 "requestBody": {
                     "content": {
@@ -117,6 +121,206 @@
                 }
             }
         },
+        "/api/v1/samples": {
+            "get": {
+                "tags": [
+                    "Samples V1"
+                ],
+                "summary": "List samples",
+                "description": "Returns all Sample entities",
+                "operationId": "listSamples_1",
+                "responses": {
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/SampleResponse"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Samples V1"
+                ],
+                "summary": "Create a sample",
+                "description": "Creates a new Sample entity",
+                "operationId": "createSample_1",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateSampleRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "400": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "Sample created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SampleResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v2/samples/{id}": {
+            "get": {
+                "tags": [
+                    "Samples V2"
+                ],
+                "summary": "Get sample by ID (V2)",
+                "description": "Returns a sample in V2 format",
+                "operationId": "getSample",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "Sample found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SampleResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Sample not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v2/samples/statistics": {
+            "get": {
+                "tags": [
+                    "Samples V2"
+                ],
+                "summary": "Get sample statistics",
+                "description": "Returns aggregate statistics for all samples (NEW in V2)",
+                "operationId": "getStatistics",
+                "responses": {
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "Statistics retrieved",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StatisticsResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/samples/{id}": {
             "get": {
                 "tags": [
@@ -124,7 +328,7 @@
                 ],
                 "summary": "Get sample by ID",
                 "description": "Returns a sample by its ID",
-                "operationId": "getSample",
+                "operationId": "getSample_1",
                 "parameters": [
                     {
                         "name": "id",
@@ -230,7 +434,7 @@
             },
             "CreateSampleRequest": {
                 "type": "object",
-                "description": "Request to create a new sample",
+                "description": "Request to create a new sample V2",
                 "properties": {
                     "text": {
                         "type": "string",
@@ -249,22 +453,20 @@
                     },
                     "status": {
                         "type": "string",
-                        "description": "Status enum",
+                        "description": "Status (ACTIVE or INACTIVE)",
                         "enum": [
                             "active",
                             "inactive"
                         ],
-                        "example": "active"
+                        "example": "ACTIVE"
                     },
-                    "extras": {
-                        "type": "object",
-                        "additionalProperties": {
-                            "type": "string"
-                        },
-                        "description": "Extra key-value pairs",
-                        "example": {
-                            "foo": "1"
-                        }
+                    "priority": {
+                        "type": "integer",
+                        "format": "int32",
+                        "description": "Priority level (1-10)",
+                        "example": 5,
+                        "maximum": 10,
+                        "minimum": 1
                     }
                 },
                 "required": [
@@ -322,6 +524,48 @@
                         "type": "string",
                         "format": "date-time",
                         "description": "Last update timestamp"
+                    }
+                }
+            },
+            "StatisticsResponse": {
+                "type": "object",
+                "description": "Aggregate statistics for all samples",
+                "properties": {
+                    "totalCount": {
+                        "type": "integer",
+                        "format": "int64",
+                        "description": "Total number of samples",
+                        "example": 42
+                    },
+                    "averageNumber": {
+                        "type": "number",
+                        "format": "double",
+                        "description": "Average number value across all samples",
+                        "example": 123.45
+                    },
+                    "totalNumberSum": {
+                        "type": "integer",
+                        "format": "int64",
+                        "description": "Sum of all number values",
+                        "example": 5185
+                    },
+                    "countByStatus": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "description": "Count by status",
+                        "example": {
+                            "ACTIVE": 30,
+                            "INACTIVE": 12
+                        }
+                    },
+                    "averagePriority": {
+                        "type": "number",
+                        "format": "double",
+                        "description": "Average priority across all samples",
+                        "example": 5.5
                     }
                 }
             }
