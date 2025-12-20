@@ -33,6 +33,22 @@ mvn spring-boot:run
 
 The application will be available at http://localhost:8080
 
+### Test Results
+
+**View test results in multiple ways:**
+
+| Method | Description | Link |
+|--------|-------------|------|
+| 🌐 **GitHub Pages** | Static overview page | [Test Results](https://macintorsten.github.io/reflection/tests.html) |
+| 🔍 **Actions UI** | Live results with annotations | [CI Runs](https://github.com/macintorsten/reflection/actions) |
+| � **Local Coverage** | Run `mvn verify` | Open `target/site/jacoco/index.html` |
+
+**GitHub Actions Features:**
+- Test results with line-level annotations on failures
+- Test summary table in workflow run
+- Coverage reports available as downloadable artifacts
+- Playwright screenshots uploaded as artifacts on failures
+
 ### API Documentation
 
 [![Deploy API Documentation](https://github.com/macintorsten/reflection/actions/workflows/deploy-docs.yml/badge.svg)](https://github.com/macintorsten/reflection/actions/workflows/deploy-docs.yml)
@@ -46,12 +62,21 @@ The documentation is automatically generated and deployed:
 
 ## CI/CD
 
-The project uses GitHub Actions for continuous integration. The CI workflow:
-- Runs on every push to `main` and all pull requests
-- Executes the full test suite with Testcontainers
-- Uploads test results as artifacts
+The project uses GitHub Actions for continuous integration:
 
-See [.github/workflows/ci.yml](.github/workflows/ci.yml) for details.
+- ✅ Runs on every push to `main` and all pull requests
+- ✅ Executes full test suite (115+ tests) with Testcontainers and Playwright
+- ✅ Uses [mikepenz/action-junit-report](https://github.com/mikepenz/action-junit-report) for test reporting
+- ✅ Uploads test artifacts and screenshots on failures
+- ✅ Generates code coverage reports with JaCoCo
+
+**Test Reporting:**
+- JUnit test results with annotations directly in Actions UI
+- Detailed test summary in workflow runs (provided by action-junit-report)
+- JaCoCo coverage reports available as downloadable artifacts
+- Playwright screenshots captured on failures
+
+See [.github/workflows/ci.yml](.github/workflows/ci.yml) for the complete configuration.
 
 ## GitHub Copilot Instructions
 
