@@ -20,4 +20,4 @@ Analyze Maven dependency updates to identify security issues, breaking changes, 
 - Major features (only if transformative)
 - Migration notes and warnings
 
-Follow the [Maven Dependency Research Instructions](../instructions/maven-dependency-research.instructions.md) for detailed methodology.
+Follow the [Maven Dependency Research Skill](../skills/maven-dependency-research/SKILL.md) for detailed methodology.
