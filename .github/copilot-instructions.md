@@ -1,146 +1,99 @@
 # Copilot Instructions for Reflection Repository
 
-## Repository Summary
-Java Spring Boot REST API with PostgreSQL backend demonstrating modern Spring Boot patterns, REST API design, and testing with Testcontainers.
+## What This Repository Does
 
-**Stack Discovery:**
+Java 21 Spring Boot REST API with PostgreSQL demonstrating REST API design, JPA/Hibernate, integration testing with Testcontainers, OpenAPI documentation, and CI/CD with GitHub Actions.
+
+## Technology Stack
+
+- **Language:** Java 21
+- **Framework:** Spring Boot 3.5.8
+- **Database:** PostgreSQL 17 (via Docker Compose)
+- **Build Tool:** Maven 3.9.9
+- **Testing:** JUnit 5, Testcontainers, Playwright Java
+- **Frontend:** Vanilla HTML/CSS/JavaScript
+
+## Build, Test, and Run
+
+**Build the project:**
 ```bash
-# Java version
-grep -E "<java.version>|<maven.compiler.source>" pom.xml
-
-# Spring Boot version
-grep -A 2 "<parent>" pom.xml | grep "<version>"
-
-# Database
-grep "image:" docker-compose.yml
-
-# Key dependencies
-grep "<artifactId>" pom.xml | grep -E "spring-boot-starter|postgresql|testcontainers"
+mvn clean package
 ```
 
-## Project Purpose
-This is a sample REST API project showcasing:
-- RESTful API design with Spring Boot
-- JPA/Hibernate entity management with PostgreSQL
-- Integration testing using Testcontainers
-- OpenAPI/Swagger documentation
-- CI/CD with GitHub Actions
-- Modern Java practices (records, pattern matching, etc.)
-
-## Discovering Project Details
-
-**Find Components:**
+**Run all tests:**
 ```bash
-# Find all API endpoints
-grep -r "@.*Mapping" src/main/java --include="*Controller.java"
-
-# Find entities
-grep -r "@Entity" src/main/java --include="*.java"
-
-# Find DTOs
-find src/main/java -name "*DTO.java" -o -name "*Dto.java"
-
-# Find repositories
-grep -r "extends JpaRepository" src/main/java --include="*.java"
-
-# Find services
-grep -r "@Service" src/main/java --include="*.java"
+mvn test
 ```
 
-**Find Configuration:**
+**Start application locally:**
 ```bash
-# Database config
-grep "spring.datasource\|spring.jpa" src/main/resources/application.properties
+# Start PostgreSQL
+docker compose up -d
 
-# Server config
-grep "server\." src/main/resources/application.properties
+# Run application
+mvn spring-boot:run
 
-# Docker services
-grep -A 10 "services:" docker-compose.yml
+# Access at http://localhost:8080
+# Swagger UI: http://localhost:8080/swagger-ui.html
 ```
 
-## 📚 Instruction Index
-**Load these files when needed for specific tasks:**
-
-| Task | File |
-|------|------|
-| **Build, Test, Run** | `.github/instructions/build-and-test.instructions.md` |
-| **Code Structure** | `.github/instructions/architecture.instructions.md` |
-| **API Versioning & Specs** | `.github/instructions/api-versioning.instructions.md` |
-| **Dep Research** | `.github/skills/maven-dependency-research/SKILL.md` |
-| **TDD Workflow** | `.github/skills/tdd/SKILL.md` |
-| **Authoring** | `.github/instructions/copilot-authoring.instructions.md` |
-
-## Agent Skills Available
-
-### Maven Dependency Research
-**Location:** `.github/skills/maven-dependency-research/`
-
-**Purpose:** Research Maven dependency updates with breaking changes, security info, and migration guidance.
-
-**Usage:**
+**Run specific test types:**
 ```bash
-cd .github/skills/maven-dependency-research
-./scripts/fetch-maven-versions.sh <groupId> <artifactId> <currentVersion> <availableVersion>
+# Backend tests only (excludes frontend)
+mvn test -Dtest="!*FrontendTest"
+
+# Frontend tests only (Playwright)
+mvn test -Dtest="*FrontendTest"
+
+# Debug frontend tests with visible browser
+HEADED=true mvn test -Dtest="V1DashboardFrontendTest"
 ```
 
-See `SKILL.md` in the skill directory for complete documentation.
+## Architecture
 
-### Test Driven Development (TDD)
-**Location:** `.github/skills/tdd/`
+**Layered:** Controller → Service → Repository  
+**Versioning:** v1/v2 packages (URL-based)  
+**Testing:** Testcontainers (PostgreSQL), Playwright (frontend E2E)
 
-**Purpose:** Automate TDD workflow with test discovery, scaffolding, execution, and coverage analysis.
+## Validation Before Committing
 
-**Usage:**
+**Always run these commands to verify changes:**
 ```bash
-cd .github/skills/tdd
-# Discover test patterns
-./scripts/discover-test-patterns.sh
+# 1. Compile check
+mvn clean compile
 
-# Generate test scaffold
-./scripts/generate-test-scaffold.sh <ComponentName> <type> [unit|integration]
+# 2. Run all tests
+mvn test
 
-# Run targeted tests
-./scripts/run-targeted-tests.sh <TestClass>
-
-# Analyze coverage
-./scripts/analyze-coverage.sh [target]
+# 3. Full package (includes integration tests)
+mvn clean package
 ```
 
-See `SKILL.md` in the skill directory for complete documentation.
+**CI/CD Pipeline:** GitHub Actions runs `mvn clean verify` on push/PR.
 
-## Development Workflow
-1. **Before Code Changes:** Always run `mvn clean compile` and `mvn test` to establish baseline
-2. **Making Changes:** Follow existing patterns (discover with grep/find commands)
-3. **Testing:** Write integration tests using Testcontainers (find examples in src/test/java)
-4. **Validation:** Run `mvn clean package` to ensure build succeeds
-5. **Manual Testing:** Use `docker compose up -d` + `mvn spring-boot:run` for local testing
+## Path-Specific Instructions
 
-## Coding Standards
+**Detailed instructions are in `.github/instructions/`:**
+- `build-and-test.instructions.md` - Required before modifying application code
+- `architecture.instructions.md` - Applies to `**/*.java`
+- `api-versioning.instructions.md` - API versioning rules
+- `development-workflow.instructions.md` - Applies to all files
+- `discovery.instructions.md` - Commands to find components (applies to `**/*.java`)
+- `copilot-authoring.instructions.md` - Applies to `.github/**/*.md`
 
-**Discover Project Standards:**
-```bash
-# Find annotation patterns
-grep -r "@SpringBootApplication\|@RestController\|@Service" src/main/java --include="*.java" | head -10
+**Agent Skills (see SKILL.md in each directory):**
+- `.github/skills/maven-dependency-research/` - Research dependency updates
+- `.github/skills/tdd/` - Test-driven development automation
+- `.github/skills/playwright-frontend-testing/` - Frontend E2E testing
 
-# Find validation patterns
-grep -r "@Valid\|@NotNull\|@NotBlank" src/main/java --include="*.java" | head -10
+## Critical Rules
 
-# Find exception handling
-grep -r "@ControllerAdvice\|@ExceptionHandler" src/main/java --include="*.java"
-```
+⚠️ **Trust the instruction files** - Load them before making changes to their applicable paths.
 
-**General Guidelines:**
-- Follow Spring Boot conventions (annotations, dependency injection)
-- Maintain separation of concerns (Controller → Service → Repository)
-- Include validation on DTOs using Bean Validation annotations
-- Write integration tests for API endpoints
-- Document public APIs with OpenAPI annotations
-- Use Java features appropriate to project version (check pom.xml)
+🐳 **Use `docker compose`** (v2), not `docker-compose` (v1).
 
-## Critical Reminders
-*   🐳 **Use `docker compose` v2** (not `docker-compose` v1).
-*   ⚠️ **Trust the instruction files** linked above.
-*   🧪 **Tests use Testcontainers** - no manual database setup needed.
-*   📦 **Maven is the build tool** - use `mvn` commands, not Gradle.
-*   🔍 **Discover before changing** - use grep/find to understand existing patterns.
+🧪 **Tests use Testcontainers** - No manual database setup required.
+
+📦 **Maven is the build tool** - Use `mvn` commands, not Gradle.
+
+✅ **Always validate before committing** - Run `mvn clean package` to catch issues early.
