@@ -35,19 +35,10 @@ The application will be available at http://localhost:8080
 
 ### Test Results
 
-**View test results in multiple ways:**
+**View test results in:**
 
-| Method | Description | Link |
-|--------|-------------|------|
-| 🌐 **GitHub Pages** | Static overview page | [Test Results](https://macintorsten.github.io/reflection/tests.html) |
-| 🔍 **Actions UI** | Live results with annotations | [CI Runs](https://github.com/macintorsten/reflection/actions) |
-| � **Local Coverage** | Run `mvn verify` | Open `target/site/jacoco/index.html` |
-
-**GitHub Actions Features:**
-- Test results with line-level annotations on failures
-- Test summary table in workflow run
-- Coverage reports available as downloadable artifacts
-- Playwright screenshots uploaded as artifacts on failures
+- 🔍 **GitHub Actions** - [CI Runs](https://github.com/macintorsten/reflection/actions) with line-level annotations on failures
+- 📊 **Local Coverage** - Run `mvn verify` then open `target/site/jacoco/index.html`
 
 ### API Documentation
 
@@ -69,12 +60,6 @@ The project uses GitHub Actions for continuous integration:
 - ✅ Uses [mikepenz/action-junit-report](https://github.com/mikepenz/action-junit-report) for test reporting
 - ✅ Uploads test artifacts and screenshots on failures
 - ✅ Generates code coverage reports with JaCoCo
-
-**Test Reporting:**
-- JUnit test results with annotations directly in Actions UI
-- Detailed test summary in workflow runs (provided by action-junit-report)
-- JaCoCo coverage reports available as downloadable artifacts
-- Playwright screenshots captured on failures
 
 See [.github/workflows/ci.yml](.github/workflows/ci.yml) for the complete configuration.
 

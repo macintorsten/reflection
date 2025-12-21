@@ -22,7 +22,7 @@ import static org.springframework.test.util.AssertionErrors.assertTrue;
  * Usage with MockMVC:
  * <pre>
  * mockMvc.perform(post("/api/samples").content("..."))
- *     .andExpect(OpenApiValidator.matchesOpenApi("openapi-spec.json", "POST", "/api/samples", 200));
+ *     .andExpect(OpenApiValidator.matchesOpenApi("openapi.json", "POST", "/api/samples", 200));
  * </pre>
  */
 public class OpenApiValidator {
@@ -32,7 +32,7 @@ public class OpenApiValidator {
     /**
      * Create a ResultMatcher that validates both status code and response body against OpenAPI spec.
      * 
-     * @param openApiPath Path to OpenAPI spec file in classpath (e.g., "openapi-spec.json")
+     * @param openApiPath Path to OpenAPI spec file in classpath (e.g., "openapi.json")
      * @param method HTTP method (e.g., "GET", "POST")
      * @param path API path (e.g., "/api/samples")
      * @param expectedStatus Expected HTTP status code (e.g., 200, 400)

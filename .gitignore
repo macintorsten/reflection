@@ -54,5 +54,5 @@ logs/
 # Others
 *.swp
 
-# Generated documentation
-docs/openapi.json
+# Documentation (generated during CI/CD)
+# Note: docs/openapi.json is committed as the single source of truth

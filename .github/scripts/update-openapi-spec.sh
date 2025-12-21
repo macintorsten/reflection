@@ -3,9 +3,9 @@ set -e
 
 # Script to regenerate the OpenAPI specification baseline
 # Run this whenever you intentionally change the API (non-breaking changes)
-# This updates .github/api-specs/v1/openapi.json
+# This updates docs/openapi.json (single source of truth)
 
-OUTPUT_DIR="${1:-$(dirname "$0")/../../.github/api-specs/v1}"
+OUTPUT_DIR="${1:-$(dirname "$0")/../../docs}"
 OUTPUT_FILE="${OUTPUT_DIR}/openapi.json"
 
 echo "=== OpenAPI Spec Baseline Update Script ==="
@@ -72,5 +72,5 @@ echo ""
 echo "Next steps:"
 echo "1. Review changes: git diff ${OUTPUT_FILE}"
 echo "2. Run tests to verify: mvn test"
-echo "3. Commit changes: git add ${OUTPUT_FILE} && git commit -m 'chore: update API v1 baseline spec'"
+echo "3. Commit changes: git add ${OUTPUT_FILE} && git commit -m 'chore: update OpenAPI spec'"
 echo ""

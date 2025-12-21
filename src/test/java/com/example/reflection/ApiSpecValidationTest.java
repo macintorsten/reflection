@@ -66,10 +66,10 @@ class ApiSpecValidationTest extends AbstractIntegrationTest {
                       Create a new API version: src/main/java/.../web/controller/v2/...
                       Then update specs for both v1 and v2.
                 
-                3. Current spec from running app vs baseline spec in .github/api-specs/v1/openapi.json differ.
+                3. Current spec from running app vs baseline spec in docs/openapi.json differ.
                 
                 To debug, regenerate spec locally and review changes:
-                  git diff .github/api-specs/v1/openapi.json
+                  git diff docs/openapi.json
                 """)
             .isEqualTo(baselineJson);
     }
@@ -86,18 +86,18 @@ class ApiSpecValidationTest extends AbstractIntegrationTest {
 
     /**
      * Load the baseline OpenAPI spec from the classpath.
-     * The spec is located at .github/api-specs/v1/openapi.json but copied to classpath during build.
+     * The spec is located at docs/openapi.json but copied to classpath during build.
      */
     private String loadBaselineSpec() throws IOException {
         // Maven will make this available in the classpath during the build
         try (InputStream is = ApiSpecValidationTest.class.getClassLoader()
-                .getResourceAsStream("openapi-v1.json")) {
+                .getResourceAsStream("openapi.json")) {
             
             if (is == null) {
                 throw new RuntimeException("""
-                    Baseline OpenAPI spec not found in classpath: openapi-v1.json
+                    Baseline OpenAPI spec not found in classpath: openapi.json
                     
-                    This file should be copied from .github/api-specs/v1/openapi.json
+                    This file should be copied from docs/openapi.json
                     during the Maven build process. Check your pom.xml resources configuration.
                     """);
             }

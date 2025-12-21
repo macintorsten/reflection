@@ -4,9 +4,7 @@ on:
   push:
     branches: [ main ]
     paths:
-      - 'src/**'
-      - 'pom.xml'
-      - '.github/api-specs/**'
+      - 'docs/**'
       - '.github/workflows/deploy-docs.yml'
   workflow_dispatch:
 
@@ -31,10 +29,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      
-      - name: Copy baseline OpenAPI spec to docs
-        run: |
-          cp .github/api-specs/v1/openapi.json docs/openapi.json
       
       - name: Setup Pages
         uses: actions/configure-pages@v4

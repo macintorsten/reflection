@@ -52,7 +52,7 @@ class SampleControllerV2IntegrationTest extends AbstractIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isCreated())
-            .andExpect(OpenApiValidator.matchesOpenApi("openapi-v1.json", "POST", "/api/v2/samples", 201))
+            .andExpect(OpenApiValidator.matchesOpenApi("openapi.json", "POST", "/api/v2/samples", 201))
             // Assert business-critical values only (structure validated by OpenAPI)
             .andExpect(jsonPath("$.id").exists()) // Verify DB auto-generation
             .andExpect(jsonPath("$.text").value("Test Sample V2"))
@@ -72,7 +72,7 @@ class SampleControllerV2IntegrationTest extends AbstractIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isCreated())
-            .andExpect(OpenApiValidator.matchesOpenApi("openapi-v1.json", "POST", "/api/v2/samples", 201))
+            .andExpect(OpenApiValidator.matchesOpenApi("openapi.json", "POST", "/api/v2/samples", 201))
             .andExpect(jsonPath("$.priority").value(5));
     }
 
@@ -93,7 +93,7 @@ class SampleControllerV2IntegrationTest extends AbstractIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody))
             .andExpect(status().isBadRequest())
-            .andExpect(OpenApiValidator.matchesOpenApi("openapi-v1.json", "POST", "/api/v2/samples", 400))
+            .andExpect(OpenApiValidator.matchesOpenApi("openapi.json", "POST", "/api/v2/samples", 400))
             .andExpect(jsonPath("$.message").value("Validation failed"));
     }
 
@@ -110,7 +110,7 @@ class SampleControllerV2IntegrationTest extends AbstractIntegrationTest {
         // List samples
         mockMvc.perform(get("/api/v2/samples"))
             .andExpect(status().isOk())
-            .andExpect(OpenApiValidator.matchesOpenApi("openapi-v1.json", "GET", "/api/v2/samples", 200))
+            .andExpect(OpenApiValidator.matchesOpenApi("openapi.json", "GET", "/api/v2/samples", 200))
             // Verify business values only (structure validated by OpenAPI)
             .andExpect(jsonPath("$[0].text").value("Sample for List"))
             .andExpect(jsonPath("$[0].priority").value(3));
@@ -126,7 +126,7 @@ class SampleControllerV2IntegrationTest extends AbstractIntegrationTest {
         // Get by ID
         mockMvc.perform(get("/api/v2/samples/" + id))
             .andExpect(status().isOk())
-            .andExpect(OpenApiValidator.matchesOpenApi("openapi-v1.json", "GET", "/api/v2/samples/{id}", 200))
+            .andExpect(OpenApiValidator.matchesOpenApi("openapi.json", "GET", "/api/v2/samples/{id}", 200))
             .andExpect(jsonPath("$.id").value(id))
             .andExpect(jsonPath("$.text").value("Single Sample V2"))
             .andExpect(jsonPath("$.priority").value(7));
@@ -137,7 +137,7 @@ class SampleControllerV2IntegrationTest extends AbstractIntegrationTest {
     void testGetSampleById_NotFound() throws Exception {
         mockMvc.perform(get("/api/v2/samples/99999"))
             .andExpect(status().isNotFound())
-            .andExpect(OpenApiValidator.matchesOpenApi("openapi-v1.json", "GET", "/api/v2/samples/{id}", 404))
+            .andExpect(OpenApiValidator.matchesOpenApi("openapi.json", "GET", "/api/v2/samples/{id}", 404))
             .andExpect(jsonPath("$.message").value("Sample not found with ID: 99999"));
     }
 
@@ -146,7 +146,7 @@ class SampleControllerV2IntegrationTest extends AbstractIntegrationTest {
     void testGetStatistics_Empty() throws Exception {
         mockMvc.perform(get("/api/v2/samples/statistics"))
             .andExpect(status().isOk())
-            .andExpect(OpenApiValidator.matchesOpenApi("openapi-v1.json", "GET", "/api/v2/samples/statistics", 200))
+            .andExpect(OpenApiValidator.matchesOpenApi("openapi.json", "GET", "/api/v2/samples/statistics", 200))
             .andExpect(jsonPath("$.totalCount").value(0))
             .andExpect(jsonPath("$.averageNumber").value(0.0))
             .andExpect(jsonPath("$.totalNumberSum").value(0))
@@ -164,7 +164,7 @@ class SampleControllerV2IntegrationTest extends AbstractIntegrationTest {
 
         mockMvc.perform(get("/api/v2/samples/statistics"))
             .andExpect(status().isOk())
-            .andExpect(OpenApiValidator.matchesOpenApi("openapi-v1.json", "GET", "/api/v2/samples/statistics", 200))
+            .andExpect(OpenApiValidator.matchesOpenApi("openapi.json", "GET", "/api/v2/samples/statistics", 200))
             .andExpect(jsonPath("$.totalCount").value(3))
             .andExpect(jsonPath("$.averageNumber").value(150.0))
             .andExpect(jsonPath("$.totalNumberSum").value(450))

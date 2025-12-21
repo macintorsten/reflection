@@ -136,8 +136,8 @@
                         </goals>
                         <configuration>
                             <target>
-                                <copy file="${project.basedir}/.github/api-specs/v1/openapi.json"
-                                      tofile="${project.basedir}/target/test-classes/openapi-v1.json"
+                                <copy file="${project.basedir}/docs/openapi.json"
+                                      tofile="${project.basedir}/target/test-classes/openapi.json"
                                       verbose="false"/>
                             </target>
                         </configuration>
@@ -192,8 +192,8 @@
                 </executions>
                 <configuration>
                     <apiDocsUrl>http://localhost:8080/v3/api-docs</apiDocsUrl>
-                    <outputFileName>openapi-spec.json</outputFileName>
-                    <outputDir>${project.basedir}/src/test/resources</outputDir>
+                    <outputFileName>openapi.json</outputFileName>
+                    <outputDir>${project.basedir}/docs</outputDir>
                     <!-- Skip by default, enable with -Dspring.openapi.generate=true -->
                     <skip>true</skip>
                 </configuration>

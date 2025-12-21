@@ -13,9 +13,8 @@ The API uses checked-in OpenAPI specifications to enforce API contracts. When yo
 
 | Path | Purpose | Status |
 |------|---------|--------|
-| `.github/api-specs/v1/openapi.json` | Baseline spec for v1 API | Checked in ✅ |
-| `target/test-classes/openapi-v1.json` | Copy for tests (generated) | Not committed |
-| `docs/openapi.json` | Deployed to GitHub Pages | Not committed |
+| `docs/openapi.json` | Single source of truth - committed to repo | Checked in ✅ |
+| `target/test-classes/openapi.json` | Copy for tests (generated during build) | Not committed |
 
 ## Making API Changes
 
@@ -35,7 +34,7 @@ String description;
 3. Tests fail: `ApiSpecValidationTest` detects spec mismatch
 4. Update baseline: `.github/scripts/update-openapi-spec.sh`
 5. Run tests again: `mvn test` (should now pass)
-6. Commit: `git add .github/api-specs/v1/openapi.json && git commit -m "feat: add description to Sample"`
+6. Commit: `git add docs/openapi.json && git commit -m "feat: add description to Sample"`
 
 ### Scenario 2: Breaking Change (Removing Field)
 
@@ -58,7 +57,7 @@ Map<String, String> extras;
    src/main/java/.../web/dto/v2/response/SampleResponse.java
    ```
 5. Keep v1 API intact for backward compatibility
-6. Create new spec: `.github/api-specs/v2/openapi.json`
+6. Update spec: `docs/openapi.json` will contain both v1 and v2 endpoints
 7. Update tests for both v1 and v2
 
 ### Scenario 3: Intentional API Deprecation (Removing v1)
@@ -71,7 +70,7 @@ Only remove old API versions after deprecation period (documented in release not
 3. Release with deprecation warning
 4. After deprecation period:
    - Delete `src/main/java/.../web/controller/v1/`
-   - Delete `.github/api-specs/v1/openapi.json`
+   - Update `docs/openapi.json` (will only contain v2 endpoints)
    - Remove v1 tests
    - Release as major version bump
 
@@ -86,14 +85,14 @@ When you make non-breaking changes to the API:
 .github/scripts/update-openapi-spec.sh
 
 # 4. Verify changes
-git diff .github/api-specs/v1/openapi.json
+git diff docs/openapi.json
 
 # 5. Run tests again (should pass)
 mvn test
 
 # 6. Commit
-git add .github/api-specs/v1/openapi.json
-git commit -m "chore: update API v1 baseline spec"
+git add docs/openapi.json
+git commit -m "chore: update OpenAPI spec"
 ```
 
 ## Understanding Test Failures
@@ -120,35 +119,31 @@ git commit -m "chore: update API v1 baseline spec"
 
 ## API Versioning Examples
 
-### V1 API
-```
-.github/api-specs/v1/openapi.json
-src/main/java/.../web/controller/v1/SampleControllerV1.java
-src/main/java/.../web/dto/v1/request/CreateSampleRequest.java
-src/main/java/.../web/dto/v1/response/SampleResponse.java
-```
+### Coexisting API Versions (V1 and V2)
 
-### V2 API (Breaking Changes)
+The OpenAPI spec in `docs/openapi.json` contains **all active API versions**. When you run the application, Spring Boot automatically generates a unified spec with endpoints tagged by version:
+
 ```
-.github/api-specs/v2/openapi.json
+docs/openapi.json                              # Contains both v1 and v2 endpoints
+src/main/java/.../web/controller/v1/SampleControllerV1.java
 src/main/java/.../web/controller/v2/SampleControllerV2.java
-src/main/java/.../web/dto/v2/request/CreateSampleRequest.java
-src/main/java/.../web/dto/v2/response/SampleResponse.java
+src/main/java/.../web/dto/v1/...
+src/main/java/.../web/dto/v2/...
 ```
 
 **Both can coexist** to maintain backward compatibility:
-- `/api/v1/samples` - Original endpoints
-- `/api/v2/samples` - Updated endpoints
+- `/api/v1/samples` - Original endpoints (tagged as "v1" in spec)
+- `/api/v2/samples` - Updated endpoints (tagged as "v2" in spec)
 
 ## CI/CD Pipeline
 
 ### GitHub Pages Deployment
 1. Push to `main` branch
 2. GitHub Actions workflow runs
-3. Copies `.github/api-specs/v1/openapi.json` → `docs/openapi.json`
-4. Deploys to https://github.../reflection/
+3. Deploys `docs/` directory (containing `openapi.json`) to GitHub Pages
+4. Available at https://github.../reflection/
 
-✅ **No spec generation needed** - baseline is always source of truth
+✅ **No spec generation or copying needed** - `docs/openapi.json` is already the source of truth
 
 ### Test Validation
 1. `mvn test` runs all unit and integration tests
@@ -168,7 +163,7 @@ mockMvc.perform(post("/api/v1/samples")
     .andExpect(jsonPath("$.id").exists())
     // Validate response matches OpenAPI spec schema
     .andExpect(OpenApiValidator.matchesOpenApi(
-        "openapi-v1.json",     // Baseline spec file
+        "openapi.json",        // Baseline spec file (from docs/openapi.json)
         "POST",                // HTTP method
         "/api/v1/samples",     // API path
         201));                 // Expected status code
@@ -179,7 +174,7 @@ mockMvc.perform(post("/api/v1/samples")
 ### ApiSpecValidationTest Can't Find Spec File
 
 ```
-RuntimeException: Baseline OpenAPI spec not found in classpath: openapi-v1.json
+RuntimeException: Baseline OpenAPI spec not found in classpath: openapi.json
 ```
 
 **Solution:** Ensure Maven correctly copies the spec during build:
@@ -187,8 +182,8 @@ RuntimeException: Baseline OpenAPI spec not found in classpath: openapi-v1.json
 # Rebuild with clean
 mvn clean test
 
-# Or check if Maven resource plugin is configured correctly
-# in pom.xml (already set up, but verify if issue persists)
+# Verify docs/openapi.json exists
+ls -l docs/openapi.json
 ```
 
 ### Spec Generation Fails
@@ -224,4 +219,4 @@ tail -f /tmp/app-spec-gen.log
 | Run all tests | `mvn test` |
 | Rebuild after API change | `mvn clean test` |
 | View spec on docs site | https://macintorsten.github.io/reflection/ |
-| Compare local spec changes | `git diff .github/api-specs/v1/openapi.json` |
+| Compare local spec changes | `git diff docs/openapi.json` |
